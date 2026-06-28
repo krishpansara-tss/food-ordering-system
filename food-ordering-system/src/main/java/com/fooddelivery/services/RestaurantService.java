@@ -1,9 +1,12 @@
 package com.fooddelivery.services;
 
+import com.fooddelivery.exceptions.InvalidUserCredentialsException;
 import com.fooddelivery.exceptions.RestaurantNotFoundException;
+import com.fooddelivery.exceptions.UserNotFoundException;
 import com.fooddelivery.factory.RestaurantFactory;
 import com.fooddelivery.model.MenuItem;
 import com.fooddelivery.model.Restaurant;
+import com.fooddelivery.model.User;
 import com.fooddelivery.repository.RestaurantRepository;
 
 import java.util.Map;
@@ -23,6 +26,15 @@ public class RestaurantService {
         return restaurant;
     }
 
+    public Restaurant loginIntoRestaurant(String restaurantId){
+        Restaurant restaurant = restaurantRepository.findRestaurantById(restaurantId.toUpperCase());
+        if(restaurant == null){
+            throw new RestaurantNotFoundException("Login Failed: Restaurant with ID [" + restaurantId + "] not found.");
+        }
+
+        return restaurant;
+    }
+
     public void displayAllRestaurant(){
         Map<String, Restaurant> restaurantMap = restaurantRepository.getRestaurantList();
 
@@ -33,7 +45,29 @@ public class RestaurantService {
 
         System.out.println("\n============== AVAILABLE RESTAURANTS ==============");
         for (Restaurant r : restaurantMap.values()) {
-            System.out.println("[" + r.getRestaurantId() + "] " + r.getRestaurantName());
+            System.out.println("[" + r.getRestaurantId() + "] " + r.getRestaurantName() + " (" + r.getCity() + ")");
+        }
+        System.out.println("====================================================");
+    }
+
+    public void displayRestaurantsByCity(String city){
+        Map<String, Restaurant> restaurantMap = restaurantRepository.getRestaurantList();
+
+        if(restaurantMap == null || restaurantMap.isEmpty()){
+            System.out.println("No restaurant available.");
+            return;
+        }
+
+        boolean found = false;
+        System.out.println("\n============== AVAILABLE RESTAURANTS IN " + city.toUpperCase() + " ==============");
+        for (Restaurant r : restaurantMap.values()) {
+            if (r.getCity().equalsIgnoreCase(city)) {
+                System.out.println("[" + r.getRestaurantId() + "] " + r.getRestaurantName());
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("No restaurants found in your city: " + city);
         }
         System.out.println("====================================================");
     }

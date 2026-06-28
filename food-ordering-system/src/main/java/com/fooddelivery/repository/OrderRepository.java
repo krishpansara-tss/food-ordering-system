@@ -10,7 +10,7 @@ public class OrderRepository {
     private Map<String, Order> orderMap = new HashMap<>();
 
     public void addOrder(Order order){
-        orderMap.put(order.getCustomer().getUserId(), order);
+        orderMap.put(order.getOrderId(), order);
     }
 
     public Map<String, Order> getOrderMap() {

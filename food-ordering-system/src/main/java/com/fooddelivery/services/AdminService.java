@@ -1,6 +1,7 @@
 package com.fooddelivery.services;
 
 import com.fooddelivery.enums.OrderStatus;
+import com.fooddelivery.enums.UserType;
 import com.fooddelivery.factory.UserFactory;
 import com.fooddelivery.model.Customer;
 import com.fooddelivery.model.DeliveryPartner;
@@ -21,18 +22,50 @@ public class AdminService {
         this.userRepository = userRepository;
     }
 
-    public void addAdmin(String userName, String password, String phoneNumber, String city){
+    public User addAdmin(String userName, String password, String phoneNumber, String city){
         User newAdmin = UserFactory.createAdmin(userName, password, phoneNumber, city);
 
         userRepository.addUser(newAdmin);
 
+        return newAdmin;
+    }
+
+    public void displayAllAdmin(){
+        Map<String, User> allUserMap = userRepository.getAllUserMap();
+
+        if(allUserMap.isEmpty()){
+            System.out.println("No user registered yet.. ");
+            return;
+        }
+
+        boolean found = false;
+        System.out.println("\n======================= GLOBAL USER DIRECTORY =======================");
+        System.out.printf("| %-12s | %-18s | %-18s | %-12s |\n", "Account ID", "User Name", "Account Type", "City");
+        System.out.println("+--------------+--------------------+--------------------+--------------+");
+
+        for (User u : allUserMap.values()) {
+            if(u.getUserType() == UserType.ADMIN){
+                found = true;
+                String accountType = u.getUserType().toString();
+
+                System.out.printf("| %-12s | %-18s | %-18s | %-12s |\n",
+                        u.getUserId(), u.getUserName(), accountType, u.getCity());
+
+            }
+        }
+
+        if(!found){
+            System.out.println("No admin found.");
+            return;
+        }
+
+        System.out.println("=====================================================================");
     }
 
     public void displayAppStatistics() {
         Map<String,Order> orders = orderRepository.getOrderMap();
         Map<String, User> users = userRepository.getAllUserMap();
 
-        // 1. Calculate Financial Statistics
         double totalGrossRevenue = 0;
         double totalDiscountsGiven = 0;
         int completedDeliveries = 0;
@@ -81,6 +114,50 @@ public class AdminService {
         System.out.println("   - Total Registered Customers : " + customerCount);
         System.out.println("   - Onboarded Fleet Partners   : " + partnerCount);
         System.out.println("   - Active Fleet Fleet Ready   : " + availableDrivers);
+        System.out.println("====================================================");
+    }
+
+    public void displayRestaurantStatistics(String restaurantId) {
+        Map<String,Order> orders = orderRepository.getOrderMap();
+
+        double totalGrossRevenue = 0;
+        double totalDiscountsGiven = 0;
+        int completedDeliveries = 0;
+        int activeOrders = 0;
+        int orderCount = 0;
+
+        for (Order o : orders.values()) {
+            if(o.getRestaurantId().equals(restaurantId)){
+                orderCount++;
+                totalGrossRevenue += o.getFinalAmount();
+                totalDiscountsGiven += o.getAppliedDiscount();
+
+                if (o.getOrderStatus() == OrderStatus.DELIVERED) {
+                    completedDeliveries++;
+                } else {
+                    activeOrders++;
+                }
+            }
+        }
+
+        if(orderCount == 0){
+            System.out.println("Haven't received orders yet!!!");
+            return;
+        }
+
+        System.out.println("\n====================================================");
+        System.out.println("             RESTAURANT PERFORMANCE METRICS          ");
+        System.out.println("====================================================");
+        System.out.println(" FINANCIAL SUMMARY:");
+        System.out.printf("   - Total Revenue Earned     : ₹%.2f\n", totalGrossRevenue);
+        System.out.printf("   - Marketing Subsidies/Discounts Paid Out : ₹%.2f\n", totalDiscountsGiven);
+        System.out.printf("   - Avg Order Ticket Value   : ₹%.2f\n", orderCount == 0 ? 0 : (totalGrossRevenue / orderCount));
+
+        System.out.println("\n LOGISTICS & DISTRIBUTION:");
+        System.out.println("   - Total Orders Logged        : " + orderCount);
+        System.out.println("   - Completed Deliveries       : " + completedDeliveries);
+        System.out.println("   - Active Processing Runs     : " + activeOrders);
+
         System.out.println("====================================================");
     }
 }

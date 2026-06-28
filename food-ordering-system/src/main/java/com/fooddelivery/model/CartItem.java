@@ -1,7 +1,7 @@
 package com.fooddelivery.model;
 
 public class CartItem {
-    private MenuItem menuItem;
+    private MenuItem menuItem = null;
     private int quantity;
 
     public CartItem(MenuItem menuItem, int quantity) {

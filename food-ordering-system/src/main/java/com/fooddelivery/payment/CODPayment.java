@@ -1,4 +1,16 @@
 package com.fooddelivery.payment;
 
-public class CODPayment {
+import com.fooddelivery.interfaces.PaymentMode;
+
+public class CODPayment implements PaymentMode {
+    @Override
+    public void pay(double amount) {
+        System.out.println("Cash on Delivery (COD) selected.");
+        System.out.println("Please keep ₹" + amount + " cash ready upon delivery.");
+    }
+
+    @Override
+    public String toString() {
+        return "Cash on Delivery (COD)";
+    }
 }
