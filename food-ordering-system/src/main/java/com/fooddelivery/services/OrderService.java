@@ -1,17 +1,20 @@
 package com.fooddelivery.services;
 
+import com.fooddelivery.enums.OrderStatus;
 import com.fooddelivery.exceptions.DeliveryPartnerNotAvailable;
 import com.fooddelivery.exceptions.InvalidOrderException;
 import com.fooddelivery.exceptions.InvalidUserTypeException;
+import com.fooddelivery.interfaces.PaymentMode;
 import com.fooddelivery.model.*;
+import com.fooddelivery.payment.CODPayment;
+import com.fooddelivery.payment.CardPayment;
+import com.fooddelivery.payment.UPIPayment;
 import com.fooddelivery.repository.OrderRepository;
 import com.fooddelivery.repository.RestaurantRepository;
 import com.fooddelivery.repository.UserRepository;
+import com.fooddelivery.util.InputClass;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class OrderService {
     private OrderRepository orderRepository;
@@ -19,12 +22,13 @@ public class OrderService {
     private RestaurantRepository restaurantRepository;
     private Random random = new Random();
 
-    public OrderService(OrderRepository orderRepository, UserRepository userRepository) {
+    public OrderService(OrderRepository orderRepository, UserRepository userRepository, RestaurantRepository restaurantRepository) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
+        this.restaurantRepository = restaurantRepository;
     }
 
-    public void placeOrder(User user){
+    public void placeOrder(User user, PaymentMode paymentMode){
         if(!(user instanceof Customer)){
             throw new InvalidUserTypeException(user.getClass().getName() + " is not supported the place order operation");
         }
@@ -33,8 +37,7 @@ public class OrderService {
         Cart cart = customer.getCart();
 
         if(cart == null){
-            System.out.println("Cart not found, you can't place an order");
-            return;
+            throw new InvalidOrderException("Order failed: Cart not found, you can't place an order");
         }
 
         if(cart.getCurrentRestaurantId() == null){
@@ -47,8 +50,7 @@ public class OrderService {
         Map<String, CartItem> cartMap = cart.getCartItemMap();
 
         if(cartMap.isEmpty()){
-            System.out.println("Cart is empty, you can't place an order");
-            return;
+            throw new InvalidOrderException("Order failed: Cart is empty, you can't place an order");
         }
 
         double cartTotal = 0;
@@ -63,36 +65,62 @@ public class OrderService {
 
         double finalAmount = cartTotal - appliedDiscount;
 
-        DeliveryPartner assingedDeliveryPartner = assignRandomDeliveryPartner();
-        assingedDeliveryPartner.setAvailable(false);
+        String restaurantCity = restaurantRepository.findRestaurantById(restaurantId).getCity();
+
+        DeliveryPartner assingedDeliveryPartner = assignDeliveryPartnerByCity(restaurantCity);
 
         if(assingedDeliveryPartner == null){
             throw new DeliveryPartnerNotAvailable("Delivery Partner is Not available now, try again after some time");
         }
+        assingedDeliveryPartner.setAvailable(false);
 
-        Order order = new Order(customer, restaurantId, restaurantName, assingedDeliveryPartner, cart, cartTotal, appliedDiscount, finalAmount);
+        Cart cartSnapshot = new Cart();
+        cartSnapshot.setCurrentRestaurantId(cart.getCurrentRestaurantId());
+        cartSnapshot.setCartItemMap(new HashMap<>(cart.getCartItemMap()));
+
+        Order order = new Order.Builder()
+                .customer(customer)
+                .restaurantId(restaurantId)
+                .restaurantName(restaurantName)
+                .assignedDeliveryPartner(assingedDeliveryPartner)
+                .listOfItem(cartSnapshot)
+                .totalAmount(cartTotal)
+                .appliedDiscount(appliedDiscount)
+                .finalAmount(finalAmount)
+                .paymentMode(paymentMode)
+                .build();
+
 
         orderRepository.addOrder(order);
-
         customer.addOrderHistory(order);
+
+
+        assingedDeliveryPartner.setCurrentOrder(order);
+        assingedDeliveryPartner.getAssignedOrderList().add(order);
+
+        paymentMode.pay(finalAmount);
 
         printInvoice(order, customer);
 
         customer.getCart().setCurrentRestaurantId(null);
         customer.getCart().getCartItemMap().clear();
+
     }
 
-    public DeliveryPartner assignRandomDeliveryPartner(){
+    public DeliveryPartner assignDeliveryPartnerByCity(String city) {
         ArrayList<DeliveryPartner> driverList = new ArrayList<>();
 
         Map<String, User> userMap = userRepository.getAllUserMap();
 
-        for (User user : userMap.values()){
-            if(user instanceof DeliveryPartner && ((DeliveryPartner) user).isAvailable() ){
-                driverList.add((DeliveryPartner)user);
+        for (User user : userMap.values()) {
+            if (user instanceof DeliveryPartner) {
+                DeliveryPartner dp = (DeliveryPartner) user;
+                if (dp.isAvailable() && dp.getCity().equalsIgnoreCase(city)) {
+                    driverList.add(dp);
+                }
             }
         }
-        if(driverList.isEmpty()) return null;
+        if (driverList.isEmpty()) return null;
 
         return driverList.get(random.nextInt(driverList.size()));
     }
@@ -130,7 +158,6 @@ public class OrderService {
         }
 
         for (Order order : orderHistoryList) {
-
             System.out.println("Order ID   : " + order.getOrderId());
             System.out.println("Status     : " + order.getOrderStatus());
             System.out.println("Payment    : " + order.getPaymentMode());
@@ -151,9 +178,8 @@ public class OrderService {
             return;
         }
 
-
         for (Order order : orderHistoryList) {
-            if(order.getOrderId().equals(orderId)){
+            if(order.getOrderId().equals(orderId.toUpperCase())){
                 System.out.println("Order ID   : " + order.getOrderId());
                 System.out.println("Status     : " + order.getOrderStatus());
                 System.out.println("Payment    : " + order.getPaymentMode());
@@ -163,13 +189,112 @@ public class OrderService {
                     System.out.printf("     - %-15s x %-3d\n", ci.getMenuItem().getItemName(), ci.getQuantity());
                 }
 
-                System.out.printf("Final Bill : ₹%.2f\n", order.getFinalAmount());
+                System.out.printf("Final Bill  : ₹%.2f\n", order.getFinalAmount());
                 System.out.println("-----------------------------------------------------");
                 return;
             }
 
         }
-
         System.out.println("=====================================================");
+    }
+
+    public void displayOrdersForRestaurant(String restaurantId) {
+        Map<String, Order> orders = orderRepository.getOrderMap();
+        boolean found = false;
+
+        System.out.println("\n================= ORDERS FOR RESTAURANT =================");
+        for (Order order : orders.values()) {
+            if (order.getRestaurantId().equalsIgnoreCase(restaurantId)) {
+                found = true;
+                System.out.println("Order ID   : " + order.getOrderId());
+                System.out.println("Customer   : " + order.getCustomer().getUserName());
+                System.out.println("Amount     : ₹" + order.getFinalAmount());
+                System.out.println("Status     : " + order.getOrderStatus());
+                System.out.println("Items:");
+                for (CartItem ci : order.getListOfItem().getCartItemMap().values()) {
+                    System.out.printf("  - %-20s x %-3d\n", ci.getMenuItem().getItemName(), ci.getQuantity());
+                }
+                System.out.println("---------------------------------------------------------");
+            }
+        }
+        if (!found) {
+            System.out.println("No orders found for this restaurant yet.");
+        }
+        System.out.println("=========================================================");
+    }
+
+    public Order findOrderById(String orderId) {
+        Map<String, Order> orders = orderRepository.getOrderMap();
+        for (Order order : orders.values()) {
+            if (order.getOrderId().equalsIgnoreCase(orderId)) {
+                return order;
+            }
+        }
+        return null;
+    }
+
+    public void updateOrderStatus(String orderId, OrderStatus status) {
+        Order order = findOrderById(orderId);
+        if (order == null) {
+            throw new InvalidOrderException("Order with ID [" + orderId + "] not found.");
+        }
+        order.setOrderStatus(status);
+        System.out.println("Order status updated successfully! Order ID: " + orderId + " is now " + status);
+
+        if (status == OrderStatus.DELIVERED && order.getAssingedDeliveryPartner() != null) {
+            order.getAssingedDeliveryPartner().setAvailable(true);
+            System.out.println("Delivery partner " + order.getAssingedDeliveryPartner().getUserName() + " is now marked AVAILABLE.");
+        }
+    }
+
+    public void printOrderDetails(Order order) {
+        System.out.println("\n============= CURRENT ACTIVE ORDER =============");
+        System.out.println("Order ID     : " + order.getOrderId());
+        System.out.println("Restaurant   : " + order.getRestaurantName());
+        System.out.println("Customer     : " + order.getCustomer().getUserName());
+        System.out.println("Status       : " + order.getOrderStatus());
+        System.out.println("Items:");
+        for (CartItem ci : order.getListOfItem().getCartItemMap().values()) {
+            System.out.printf("  - %-20s x %d\n", ci.getMenuItem().getItemName(), ci.getQuantity());
+        }
+        System.out.printf("Total Amount : ₹%.2f\n", order.getFinalAmount());
+        System.out.println("================================================");
+    }
+
+    public void placeOrderFlow(Customer customer, Scanner scanner) {
+        if (customer.getCart() == null || customer.getCart().getCartItemMap().isEmpty()) {
+            System.out.println("Cannot place order: Your cart is empty.");
+            return;
+        }
+
+        System.out.println("\nSelect Payment Method:");
+        System.out.println("1. Card Payment");
+        System.out.println("2. UPI Payment");
+        System.out.println("3. Cash on Delivery (COD)");
+
+        int paymentChoice = InputClass.readInt(scanner, "Choose option (1-3): ", 1, 3);
+
+        PaymentMode paymentMode;
+        switch (paymentChoice) {
+            case 1:
+                paymentMode = new CardPayment();
+                break;
+            case 2:
+                paymentMode = new UPIPayment();
+                break;
+            case 3:
+                paymentMode = new CODPayment();
+                break;
+            default:
+                System.out.println("Invalid payment choice. Order cancelled.");
+                return;
+        }
+
+        try {
+            placeOrder(customer, paymentMode);
+            System.out.println("Order has been processed successfully!");
+        } catch (Exception e) {
+            System.out.println("Failed to place order: " + e.getMessage());
+        }
     }
 }

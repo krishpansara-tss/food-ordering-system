@@ -44,7 +44,6 @@ public class UserService {
             throw new InvalidUserCredentialsException("Login Failed: User Type doesn't match.");
         }
 
-        System.out.println("Welcome back, " + user.getUserName() + " (" + user.getClass().getSimpleName() + ")!");
         return user;
     }
 
