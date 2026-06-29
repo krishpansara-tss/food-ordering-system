@@ -4,6 +4,7 @@ import com.fooddelivery.enums.OrderStatus;
 import com.fooddelivery.exceptions.DeliveryPartnerNotAvailable;
 import com.fooddelivery.exceptions.InvalidOrderException;
 import com.fooddelivery.exceptions.InvalidUserTypeException;
+import com.fooddelivery.exceptions.OrderNotFoundException;
 import com.fooddelivery.interfaces.PaymentMode;
 import com.fooddelivery.model.*;
 import com.fooddelivery.payment.CODPayment;
@@ -58,10 +59,7 @@ public class OrderService {
             cartTotal += cartItem.getQuantity() * cartItem.getMenuItem().getPrice();
         }
 
-        double appliedDiscount = 0;
-        if (cartTotal > 500) {
-            appliedDiscount = 50.0;
-        }
+        double appliedDiscount = calculateDiscount(cartTotal);
 
         double finalAmount = cartTotal - appliedDiscount;
 
@@ -104,7 +102,13 @@ public class OrderService {
 
         customer.getCart().setCurrentRestaurantId(null);
         customer.getCart().getCartItemMap().clear();
+    }
 
+    private double calculateDiscount(double cartTotal) {
+        if (cartTotal > 2000) return cartTotal * 0.20;
+        if (cartTotal > 1000) return cartTotal * 0.10;
+        if (cartTotal > 500) return 50;
+        return 0;
     }
 
     public DeliveryPartner assignDeliveryPartnerByCity(String city) {
@@ -127,25 +131,26 @@ public class OrderService {
 
     private void printInvoice(Order order, Customer customer) {
         System.out.println("\n+---------------------------------------------------+");
-        System.out.println("|                  ORDER INVOICE                    |");
+        System.out.println("                  ORDER INVOICE                    ");
         System.out.println("+---------------------------------------------------+");
-        System.out.printf("| Order ID: %-15s | Customer: %-13s |\n", order.getOrderId(), customer.getUserName());
+        System.out.printf(" Order ID: %-15s | Customer: %-13s \n", order.getOrderId(), customer.getUserName());
+        System.out.printf(" Order Date: %-39s \n", order.getOrderDate());
         System.out.println("+---------------------------------------------------+");
-        System.out.printf("| %-20s | %-4s | %-10s | %-8s |\n", "Item Name", "Qty", "Price", "Total");
+        System.out.printf(" %-20s | %-4s | %-10s | %-8s \n", "Item Name", "Qty", "Price", "Total");
         System.out.println("+---------------------------------------------------+");
         for (CartItem ci : order.getListOfItem().getCartItemMap().values()) {
             double cost = ci.getMenuItem().getPrice() * ci.getQuantity();
-            System.out.printf("| %-20s | %-4d | ₹%-9.2f | ₹%-7.2f |\n",
+            System.out.printf(" %-20s | %-4d | ₹%-9.2f | ₹%-7.2f \n",
                     ci.getMenuItem().getItemName(), ci.getQuantity(), ci.getMenuItem().getPrice(), cost);
         }
         System.out.println("+---------------------------------------------------+");
-        System.out.printf("| Subtotal:                                 ₹%-7.2f |\n", order.getTotalAmount());
-        System.out.printf("| Discount Applied:                        -₹%-7.2f |\n", order.getAppliedDiscount());
-        System.out.printf("| GRAND TOTAL:                              ₹%-7.2f |\n", order.getFinalAmount());
+        System.out.printf("  Subtotal:                                 ₹%-7.2f  \n", order.getTotalAmount());
+        System.out.printf("  Discount Applied:                        -₹%-7.2f  \n", order.getAppliedDiscount());
+        System.out.printf("  GRAND TOTAL:                              ₹%-7.2f  \n", order.getFinalAmount());
         System.out.println("+---------------------------------------------------+");
-        System.out.printf("| Payment Mode: %-35s |\n", order.getPaymentMode());
-        System.out.printf("| Assigned Delivery Executive: %-20s |\n", order.getAssingedDeliveryPartner().getUserName());
-        System.out.printf("| Current State: %-34s |\n", order.getOrderStatus());
+        System.out.printf("  Payment Mode: %-35s |\n", order.getPaymentMode());
+        System.out.printf("  Assigned Delivery Executive: %-20s |\n", order.getAssingedDeliveryPartner().getUserName());
+        System.out.printf("  Current State: %-34s |\n", order.getOrderStatus());
         System.out.println("+---------------------------------------------------+");
     }
 
@@ -198,6 +203,18 @@ public class OrderService {
         System.out.println("=====================================================");
     }
 
+    public Map<String, Order> ordersByRestaurant(String restaurantId){
+        Map<String, Order> orders = orderRepository.getOrderMap();
+
+        for (Order order : orders.values()) {
+            if (order.getRestaurantId().equalsIgnoreCase(restaurantId)) {
+               orders.put(order.getOrderId(), order);
+            }
+        }
+
+        return  orders;
+    }
+
     public void displayOrdersForRestaurant(String restaurantId) {
         Map<String, Order> orders = orderRepository.getOrderMap();
         boolean found = false;
@@ -233,15 +250,29 @@ public class OrderService {
         return null;
     }
 
+    public void getYourOrderStatus(String orderId){
+        Order order = orderRepository.findOrderById(orderId);
+
+        if(order == null){
+            throw new OrderNotFoundException("Order with ID [" + orderId + "] not found.");
+        }
+
+        System.out.println("Your order ID       : " + orderId);
+        System.out.println("Your order Status   : " + order.getOrderStatus());
+    }
+
     public void updateOrderStatus(String orderId, OrderStatus status) {
         Order order = findOrderById(orderId);
         if (order == null) {
-            throw new InvalidOrderException("Order with ID [" + orderId + "] not found.");
+            throw new OrderNotFoundException("Order with ID [" + orderId + "] not found.");
         }
         order.setOrderStatus(status);
         System.out.println("Order status updated successfully! Order ID: " + orderId + " is now " + status);
 
         if (status == OrderStatus.DELIVERED && order.getAssingedDeliveryPartner() != null) {
+            if(order.getPaymentMode() instanceof CODPayment){
+                ((CODPayment) order.getPaymentMode()).paymentDoneOnCOD(order.getFinalAmount());
+            }
             order.getAssingedDeliveryPartner().setAvailable(true);
             System.out.println("Delivery partner " + order.getAssingedDeliveryPartner().getUserName() + " is now marked AVAILABLE.");
         }

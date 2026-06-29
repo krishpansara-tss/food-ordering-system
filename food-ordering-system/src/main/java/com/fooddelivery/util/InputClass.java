@@ -62,4 +62,34 @@ public class InputClass {
             System.out.println("Invalid response. Please enter true/yes or false/no.");
         }
     }
+
+    public static String readPassword(Scanner scanner, String message) {
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}$";
+
+        while (true) {
+            System.out.print(message);
+            String input = scanner.nextLine().trim();
+
+            if (input.isEmpty()) {
+                System.out.println("Password cannot be empty.");
+                continue;
+            }
+
+            if(input.length() < 8){
+                System.out.println("Password must have at least 8 characters ");
+            }
+
+            if (!input.matches(regex)) {
+                System.out.println("Invalid password!");
+                System.out.println("Password must contain:");
+                System.out.println("- One uppercase letter");
+                System.out.println("- One lowercase letter");
+                System.out.println("- One digit");
+                System.out.println("- One special character (@#$%^&+=!)");
+                continue;
+            }
+
+            return input;
+        }
+    }
 }

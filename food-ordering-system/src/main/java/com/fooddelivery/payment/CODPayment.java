@@ -9,6 +9,10 @@ public class CODPayment implements PaymentMode {
         System.out.println("Please keep ₹" + amount + " cash ready upon delivery.");
     }
 
+    public void paymentDoneOnCOD(double amount){
+        System.out.println("Payment of ₹"+ amount +" is Successfully done on COD.");
+    }
+
     @Override
     public String toString() {
         return "Cash on Delivery (COD)";

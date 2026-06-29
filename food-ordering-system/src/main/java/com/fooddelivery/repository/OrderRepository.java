@@ -16,4 +16,8 @@ public class OrderRepository {
     public Map<String, Order> getOrderMap() {
         return orderMap;
     }
+
+    public Order findOrderById(String orderId){
+        return orderMap.get(orderId);
+    }
 }

@@ -3,9 +3,13 @@ package com.fooddelivery.model;
 import com.fooddelivery.enums.OrderStatus;
 import com.fooddelivery.interfaces.PaymentMode;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 public class Order {
     private static long orderCount = 1000;
     private String orderId = null;
+    private LocalDateTime orderDate;
     private Customer customer = null;
     private String restaurantId;
     private String restaurantName;
@@ -17,20 +21,8 @@ public class Order {
     private PaymentMode paymentMode = null;
     private OrderStatus orderStatus = null;
 
-    public Order(Customer customer, String restaurantId, String restaurantName, DeliveryPartner assignedDeliveryPartner, Cart listOfItem, double totalAmount, double appliedDiscount, double finalAmount) {
-        this.orderId =  ("ORD-") + (++orderCount);
-        this.customer = customer;
-        this.restaurantId = restaurantId;
-        this.restaurantName = restaurantName;
-        this.assignedDeliveryPartner = assignedDeliveryPartner;
-        this.listOfItem = listOfItem;
-        this.totalAmount = totalAmount;
-        this.appliedDiscount = appliedDiscount;
-        this.finalAmount = finalAmount;
-        this.orderStatus = OrderStatus.PREPARING;
-    }
-
     private Order(Builder builder){
+        this.orderDate = LocalDateTime.now();
         this.orderId = "ORD-" + (++orderCount);
         this.customer = builder.customer;
         this.restaurantId = builder.restaurantId;
@@ -134,6 +126,10 @@ public class Order {
         this.assignedDeliveryPartner = assignedDeliveryPartner;
     }
 
+    public LocalDateTime getOrderDate() {
+        return orderDate;
+    }
+
     public Cart getListOfItem() {
         return listOfItem;
     }
@@ -146,24 +142,12 @@ public class Order {
         return totalAmount;
     }
 
-    public void setTotalAmount(double totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
     public double getAppliedDiscount() {
         return appliedDiscount;
     }
 
-    public void setAppliedDiscount(double appliedDiscount) {
-        this.appliedDiscount = appliedDiscount;
-    }
-
     public double getFinalAmount() {
         return finalAmount;
-    }
-
-    public void setFinalAmount(double finalAmount) {
-        this.finalAmount = finalAmount;
     }
 
 

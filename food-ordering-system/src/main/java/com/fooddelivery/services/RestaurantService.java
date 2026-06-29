@@ -1,6 +1,7 @@
 package com.fooddelivery.services;
 
 import com.fooddelivery.exceptions.InvalidUserCredentialsException;
+import com.fooddelivery.exceptions.ItemAlreadyExist;
 import com.fooddelivery.exceptions.RestaurantNotFoundException;
 import com.fooddelivery.exceptions.UserNotFoundException;
 import com.fooddelivery.factory.RestaurantFactory;
@@ -78,6 +79,13 @@ public class RestaurantService {
         if(restaurant == null){
             throw new RestaurantNotFoundException("Restaurant Not Found: Restaurant with ID [" + restaurantId + "] not found.");
         }
+
+        for(MenuItem menuItem : restaurant.getMenuItemList().values()){
+            if(menuItem.getItemName().equalsIgnoreCase(itemName.trim())){
+                throw new ItemAlreadyExist("Item having name: " + itemName + " is already exists");
+            }
+        }
+
         MenuItem menuItem = new MenuItem(itemName, price, isVeg);
 
         restaurant.addMenuItem(menuItem);
@@ -95,6 +103,7 @@ public class RestaurantService {
 
         if(restaurantMenuItemList == null || restaurantMenuItemList.isEmpty()){
             System.out.println("Menu not available or might not be added.");
+            return;
         }
 
         System.out.println("\n========= MENU FOR: " + restaurant.getRestaurantName().toUpperCase() + " =========");

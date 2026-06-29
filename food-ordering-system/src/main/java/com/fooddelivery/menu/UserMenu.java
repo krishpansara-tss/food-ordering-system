@@ -1,5 +1,6 @@
 package com.fooddelivery.menu;
 
+import com.fooddelivery.exceptions.MenuItemNotFoundException;
 import com.fooddelivery.interfaces.PaymentMode;
 import com.fooddelivery.model.CartItem;
 import com.fooddelivery.model.Customer;
@@ -86,7 +87,13 @@ public class UserMenu {
                 case 5:
                     String menuItemId = InputClass.readString(scanner, "Enter Menu Item ID (e.g., ITEM-1001): ").toUpperCase();
                     int quantityToRemove = InputClass.readInt(scanner, "Enter Quantity to Remove from the Cart\n If you enter the quantity more then current quantity the item will be removed from the cart: ", 1, 100);
-                    cartService.removeItemFromCart(customer, menuItemId, quantityToRemove);
+                    try{
+                        cartService.removeItemFromCart(customer, menuItemId, quantityToRemove);
+                    } catch (IllegalArgumentException | MenuItemNotFoundException e){
+                        System.out.println(e.getMessage());
+                    } catch (Exception e) {
+                        System.out.println("Unexpected Error");
+                    }
                     break;
 
                 // place order
@@ -132,8 +139,19 @@ public class UserMenu {
                     restaurantService.displayAllRestaurant();
                     break;
 
-                // logout
+                // order status
                 case 10:
+                    orderId = InputClass.readString(scanner, "Enter Order ID (e.g., ORD-1001): ");
+                    try{
+                        orderService.getYourOrderStatus(orderId);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+
+                    break;
+
+                // logout
+                case 11:
                     System.out.println("Logging out Customer session...");
                     return;
 
