@@ -1,7 +1,7 @@
 package com.fooddelivery.menu;
 
 import com.fooddelivery.enums.CuisineType;
-import com.fooddelivery.enums.OrderStatus;
+import com.fooddelivery.enums.OrderStatusType;
 import com.fooddelivery.exceptions.RestaurantNotFoundException;
 import com.fooddelivery.model.MenuItem;
 import com.fooddelivery.model.Order;
@@ -9,10 +9,8 @@ import com.fooddelivery.model.Restaurant;
 import com.fooddelivery.services.AdminService;
 import com.fooddelivery.services.OrderService;
 import com.fooddelivery.services.RestaurantService;
-import com.fooddelivery.services.UserService;
 import com.fooddelivery.util.InputClass;
 
-import java.util.Map;
 import java.util.Scanner;
 
 public class RestaurantMenu {
@@ -39,7 +37,7 @@ public class RestaurantMenu {
             System.out.println("6. Update Order Status");
             System.out.println("7. Log out");
 
-            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 7);
+            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 8);
 
             switch (choice) {
                 // add item to restaurant menu
@@ -110,47 +108,60 @@ public class RestaurantMenu {
                     adminService.displayRestaurantStatistics(restaurant.getRestaurantId());
                     break;
 
-                // view active orders
+                // view all orders
                 case 5:
-                    orderService.displayOrdersForRestaurant(restaurant.getRestaurantId());
+                    orderService.displayAllOrdersForRestaurant(restaurant.getRestaurantId());
                     break;
 
                 // update order status
                 case 6:
+                    orderService.displayActiveOrdersForRestaurant(restaurant.getRestaurantId());
+                    break;
+
+                case 7:
                     System.out.println("\n--- Update Order Status ---");
                     String orderId = InputClass.readString(scanner, "Enter Order ID (e.g. ORD-1001): ").toUpperCase().trim();
+
                     Order order = orderService.findOrderById(orderId);
                     if (order == null || !order.getRestaurantId().equalsIgnoreCase(restaurant.getRestaurantId())) {
                         System.out.println("Active order with ID [" + orderId + "] not found for your restaurant.");
                         break;
                     }
 
-                    System.out.println("Current Order Status: " + order.getOrderStatus());
-                    System.out.println("Select New Status:");
-                    System.out.println("1. PREPARING");
-                    System.out.println("2. OUT_FOR_DELIVERY");
-                    System.out.println("3. DELIVERED");
-                    int statusChoice = InputClass.readInt(scanner, "Enter option (1-3): ", 1, 3);
+                    OrderStatusType current = order.getOrderStatus().getStatus();
 
-                    OrderStatus newStatus;
-                    if (statusChoice == 1) newStatus = OrderStatus.PREPARING;
-                    else if (statusChoice == 2) newStatus = OrderStatus.OUT_FOR_DELIVERY;
-                    else newStatus = OrderStatus.DELIVERED;
+                    if(current != OrderStatusType.APPROVED_BY_RESTAURANT){
+                        System.out.println("Current Order Status: " + current);
+                        System.out.println("You don't have access for further status update");
+                        break;
+                    }
 
-                    try {
-                        orderService.updateOrderStatus(orderId, newStatus);
-                    } catch (Exception e) {
-                        System.out.println("Failed to update status: " + e.getMessage());
+                    System.out.println("\nCurrent Order: " + order.getOrderId()
+                            + "  |  Current Order Status:: " + current);
+
+                    OrderStatusType next = null;
+
+                    next = OrderStatusType.READY_FOR_DELIVERY;
+                    boolean changeStatus = InputClass.readBoolean(scanner, "Do you want to change order status to " + next + "? (true/false): ");
+
+                    if(changeStatus) {
+                        try {
+                            orderService.updateOrderStatus(order.getOrderId());
+                        } catch (Exception e) {
+                            System.out.println("Failed to update status: " + e.getMessage());
+                        }
+                    }else{
+                        System.out.println("No changes are made to the Order Status");
                     }
                     break;
 
                 // logout
-                case 7:
+                case 8:
                     System.out.println("Logging out Restaurant Owner session...");
                     return;
 
                 default:
-                    System.out.println("Invalid choice. Please select from 1-7.");
+                    System.out.println("Invalid choice. Please select from 1-8.");
             }
         }
     }

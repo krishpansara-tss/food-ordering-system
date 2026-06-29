@@ -1,15 +1,12 @@
 package com.fooddelivery.menu;
 
-import com.fooddelivery.enums.OrderStatus;
-import com.fooddelivery.model.CartItem;
-import com.fooddelivery.model.Customer;
+import com.fooddelivery.enums.OrderStatusType;
 import com.fooddelivery.model.DeliveryPartner;
 import com.fooddelivery.model.Order;
 import com.fooddelivery.services.DeliveryPartnerService;
 import com.fooddelivery.services.OrderService;
 import com.fooddelivery.util.InputClass;
 
-import java.util.List;
 import java.util.Scanner;
 
 public class DeliveryPartnerMenu {
@@ -76,28 +73,39 @@ public class DeliveryPartnerMenu {
                         break;
                     }
 
+                    OrderStatusType current = activeOrder.getOrderStatus().getStatus();
                     System.out.println("\nCurrent Order: " + activeOrder.getOrderId()
-                            + "  |  Status: " + activeOrder.getOrderStatus());
-                    System.out.println("Select New Status:");
-                    System.out.println("1. PREPARING");
-                    System.out.println("2. OUT_FOR_DELIVERY");
-                    System.out.println("3. DELIVERED");
-                    int statusChoice = InputClass.readInt(scanner, "Enter option (1-3): ", 1, 3);
+                            + "  |  Status: " + current);
 
-                    OrderStatus newStatus;
-                    if (statusChoice == 1) newStatus = OrderStatus.PREPARING;
-                    else if (statusChoice == 2) newStatus = OrderStatus.OUT_FOR_DELIVERY;
-                    else newStatus = OrderStatus.DELIVERED;
+                    if(current == OrderStatusType.APPROVED_BY_RESTAURANT){
+                        System.out.println("Current Order Status: " + current);
+                        System.out.println("You don't have access to update current status");
+                        break;
+                    }
 
-                    try {
-                        orderService.updateOrderStatus(activeOrder.getOrderId(), newStatus);
+                    if (current == OrderStatusType.DELIVERED) {
+                        System.out.println("Order is already delivered.");
+                        break;
+                    }
+                    OrderStatusType next = null;
+                    if (current == OrderStatusType.READY_FOR_DELIVERY) next = OrderStatusType.OUT_FOR_DELIVERY;
+                    else if (current == OrderStatusType.OUT_FOR_DELIVERY) next = OrderStatusType.DELIVERED;
 
-                        if (newStatus == OrderStatus.DELIVERED) {
-                            partner.setCurrentOrder(null);
-                            System.out.println("Great work! You are now marked as AVAILABLE for new orders.");
+                    boolean changeStatus = InputClass.readBoolean(scanner, "Do you want to change order status to " + next + "? (true/false): ");
+
+                    if(changeStatus) {
+                        try {
+                            orderService.updateOrderStatus(activeOrder.getOrderId());
+
+                            if (activeOrder.getOrderStatus().getStatus() == OrderStatusType.DELIVERED) {
+                                partner.setCurrentOrder(null);
+                                System.out.println("Great work! You are now marked as AVAILABLE for new orders.");
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Failed to update status: " + e.getMessage());
                         }
-                    } catch (Exception e) {
-                        System.out.println("Failed to update status: " + e.getMessage());
+                    }else{
+                        System.out.println("No changes are made to the Order Status");
                     }
                     break;
 

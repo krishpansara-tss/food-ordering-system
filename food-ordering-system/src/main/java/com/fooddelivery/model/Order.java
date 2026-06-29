@@ -1,7 +1,10 @@
 package com.fooddelivery.model;
 
-import com.fooddelivery.enums.OrderStatus;
+import com.fooddelivery.enums.OrderStatusType;
+import com.fooddelivery.interfaces.OrderStatus;
 import com.fooddelivery.interfaces.PaymentMode;
+import com.fooddelivery.state.PlacedState;
+import com.fooddelivery.state.OrderStateBuilder;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +21,7 @@ public class Order {
     private double appliedDiscount;
     private double finalAmount;
     private PaymentMode paymentMode = null;
-    private OrderStatus orderStatus = null;
+    public OrderStatus orderStatus;
 
     private Order(Builder builder){
         this.orderDate = LocalDateTime.now();
@@ -32,6 +35,7 @@ public class Order {
         this.appliedDiscount = builder.appliedDiscount;
         this.finalAmount = builder.finalAmount;
         this.paymentMode = builder.paymentMode;
+        this.orderStatus = OrderStateBuilder.build(builder.orderStatus);
     }
 
     public static class Builder{
@@ -45,7 +49,7 @@ public class Order {
         private double appliedDiscount;
         private double finalAmount;
         private PaymentMode paymentMode;
-        private OrderStatus orderStatus;
+        private OrderStatusType orderStatus;
 
         public Builder customer(Customer customer){
             this.customer = customer;
@@ -83,7 +87,7 @@ public class Order {
             this.paymentMode = paymentMode;
             return this;
         }
-        public Builder orderStatus(OrderStatus orderStatus){
+        public Builder orderStatus(OrderStatusType orderStatus){
             this.orderStatus = orderStatus;
             return this;
         }
@@ -157,6 +161,10 @@ public class Order {
 
     public OrderStatus getOrderStatus() {
         return orderStatus;
+    }
+
+    public void nextState(){
+        orderStatus.nextState(this);
     }
 
     public void setOrderStatus(OrderStatus orderStatus) {

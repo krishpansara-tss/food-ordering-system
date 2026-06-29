@@ -1,6 +1,6 @@
 package com.fooddelivery.services;
 
-import com.fooddelivery.enums.OrderStatus;
+import com.fooddelivery.enums.OrderStatusType;
 import com.fooddelivery.exceptions.DeliveryPartnerNotAvailable;
 import com.fooddelivery.exceptions.InvalidOrderException;
 import com.fooddelivery.exceptions.InvalidUserTypeException;
@@ -8,12 +8,10 @@ import com.fooddelivery.exceptions.OrderNotFoundException;
 import com.fooddelivery.interfaces.PaymentMode;
 import com.fooddelivery.model.*;
 import com.fooddelivery.payment.CODPayment;
-import com.fooddelivery.payment.CardPayment;
-import com.fooddelivery.payment.UPIPayment;
 import com.fooddelivery.repository.OrderRepository;
 import com.fooddelivery.repository.RestaurantRepository;
 import com.fooddelivery.repository.UserRepository;
-import com.fooddelivery.util.InputClass;
+import com.fooddelivery.state.OrderStateBuilder;
 
 import java.util.*;
 
@@ -204,18 +202,44 @@ public class OrderService {
     }
 
     public Map<String, Order> ordersByRestaurant(String restaurantId){
-        Map<String, Order> orders = orderRepository.getOrderMap();
+        Map<String, Order> allOrders = orderRepository.getOrderMap();
+        Map<String, Order> restaurantOrders = new HashMap<>();
 
-        for (Order order : orders.values()) {
+        for (Order order : allOrders.values()) {
             if (order.getRestaurantId().equalsIgnoreCase(restaurantId)) {
-               orders.put(order.getOrderId(), order);
+               restaurantOrders.put(order.getOrderId(), order);
             }
         }
 
-        return  orders;
+        return restaurantOrders;
     }
 
-    public void displayOrdersForRestaurant(String restaurantId) {
+    public void displayActiveOrdersForRestaurant(String restaurantId) {
+        Map<String, Order> orders = orderRepository.getOrderMap();
+        boolean found = false;
+
+        System.out.println("\n================= ORDERS FOR RESTAURANT =================");
+        for (Order order : orders.values()) {
+            if (order.getRestaurantId().equalsIgnoreCase(restaurantId) && order.getOrderStatus().getStatus() == OrderStatusType.APPROVED_BY_RESTAURANT) {
+                found = true;
+                System.out.println("Order ID   : " + order.getOrderId());
+                System.out.println("Customer   : " + order.getCustomer().getUserName());
+                System.out.println("Amount     : ₹" + order.getFinalAmount());
+                System.out.println("Status     : " + order.getOrderStatus());
+                System.out.println("Items:");
+                for (CartItem ci : order.getListOfItem().getCartItemMap().values()) {
+                    System.out.printf("  - %-20s x %-3d\n", ci.getMenuItem().getItemName(), ci.getQuantity());
+                }
+                System.out.println("---------------------------------------------------------");
+            }
+        }
+        if (!found) {
+            System.out.println("No active orders found for this restaurant yet.");
+        }
+        System.out.println("=========================================================");
+    }
+
+    public void displayAllOrdersForRestaurant(String restaurantId) {
         Map<String, Order> orders = orderRepository.getOrderMap();
         boolean found = false;
 
@@ -261,15 +285,25 @@ public class OrderService {
         System.out.println("Your order Status   : " + order.getOrderStatus());
     }
 
-    public void updateOrderStatus(String orderId, OrderStatus status) {
+    public void updateOrderStatus(String orderId) {
         Order order = findOrderById(orderId);
         if (order == null) {
             throw new OrderNotFoundException("Order with ID [" + orderId + "] not found.");
         }
-        order.setOrderStatus(status);
-        System.out.println("Order status updated successfully! Order ID: " + orderId + " is now " + status);
+        OrderStatusType currentStatus = order.getOrderStatus().getStatus();
+        if (currentStatus == OrderStatusType.DELIVERED) {
+            System.out.println("Order with ID [" + orderId + "] is already DELIVERED. Cannot update status further.");
+            return;
+        }
+        try{
+            order.nextState();
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+        OrderStatusType currType = order.getOrderStatus().getStatus();
 
-        if (status == OrderStatus.DELIVERED && order.getAssingedDeliveryPartner() != null) {
+        System.out.println("Order status updated successfully! Order ID: " + orderId + " is now " + currType);
+        if (currType == OrderStatusType.DELIVERED && order.getAssingedDeliveryPartner() != null) {
             if(order.getPaymentMode() instanceof CODPayment){
                 ((CODPayment) order.getPaymentMode()).paymentDoneOnCOD(order.getFinalAmount());
             }

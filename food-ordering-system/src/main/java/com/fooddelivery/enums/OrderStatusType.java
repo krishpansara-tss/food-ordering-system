@@ -1,8 +1,8 @@
 package com.fooddelivery.enums;
 
-public enum OrderStatus {
+public enum OrderStatusType {
     APPROVED_BY_RESTAURANT,
-    PREPARING,
+    READY_FOR_DELIVERY,
     OUT_FOR_DELIVERY,
     DELIVERED
 }

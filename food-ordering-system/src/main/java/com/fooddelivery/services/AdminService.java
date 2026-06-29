@@ -1,6 +1,6 @@
 package com.fooddelivery.services;
 
-import com.fooddelivery.enums.OrderStatus;
+import com.fooddelivery.enums.OrderStatusType;
 import com.fooddelivery.enums.UserType;
 import com.fooddelivery.factory.UserFactory;
 import com.fooddelivery.model.Customer;
@@ -73,7 +73,7 @@ public class AdminService {
             totalGrossRevenue += o.getFinalAmount();
             totalDiscountsGiven += o.getAppliedDiscount();
 
-            if (o.getOrderStatus() == OrderStatus.DELIVERED) {
+            if (o.getOrderStatus().getStatus() == OrderStatusType.DELIVERED) {
                 completedDeliveries++;
             } else {
                 activeOrders++;
@@ -130,7 +130,7 @@ public class AdminService {
                 totalGrossRevenue += o.getFinalAmount();
                 totalDiscountsGiven += o.getAppliedDiscount();
 
-                if (o.getOrderStatus() == OrderStatus.DELIVERED) {
+                if (o.getOrderStatus().getStatus() == OrderStatusType.DELIVERED) {
                     completedDeliveries++;
                 } else {
                     activeOrders++;

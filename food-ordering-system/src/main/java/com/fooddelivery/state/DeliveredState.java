@@ -4,24 +4,24 @@ import com.fooddelivery.enums.OrderStatusType;
 import com.fooddelivery.interfaces.OrderStatus;
 import com.fooddelivery.model.Order;
 
-public class PlacedState implements OrderStatus {
+public class DeliveredState implements OrderStatus {
     @Override
     public void nextState(Order order) {
-        order.setOrderStatus(new ReadyForDeliveryState());
+        throw new IllegalArgumentException("Order is already delivered. No further state transitions.");
     }
 
     @Override
     public void currentState() {
-        System.out.println("Order has been placed and approved by the restaurant.");
+        System.out.println("Order is successfully delivered.");
     }
 
     @Override
     public OrderStatusType getStatus() {
-        return OrderStatusType.APPROVED_BY_RESTAURANT;
+        return OrderStatusType.DELIVERED;
     }
 
     @Override
     public String toString() {
-        return "APPROVED_BY_RESTAURANT";
+        return "DELIVERED";
     }
 }
