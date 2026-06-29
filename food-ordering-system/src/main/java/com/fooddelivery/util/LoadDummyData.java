@@ -1,5 +1,6 @@
 package com.fooddelivery.util;
 
+import com.fooddelivery.enums.CuisineType;
 import com.fooddelivery.enums.UserType;
 import com.fooddelivery.factory.RestaurantFactory;
 import com.fooddelivery.factory.UserFactory;
@@ -34,30 +35,36 @@ public class LoadDummyData {
         userRepository.addUser(dp3);
 
         Restaurant r1 = RestaurantFactory.createRestaurant("Mavdi Chowk Khichdi House", "9000111001", "Rajkot");
-        r1.addMenuItem(new MenuItem("Dal Khichdi",           60.0,  true));
-        r1.addMenuItem(new MenuItem("Masala Khichdi",        75.0,  true));
-        r1.addMenuItem(new MenuItem("Gujarati Thali",        180.0, true));
-        r1.addMenuItem(new MenuItem("Methi Thepla",          40.0,  true));
-        r1.addMenuItem(new MenuItem("Aamras Puri",           90.0,  true));
-        r1.addMenuItem(new MenuItem("Chicken Curry",         160.0, false));
+        r1.addMenuItem(new MenuItem("Dal Khichdi",           60.0,  true, CuisineType.INDIAN));
+        r1.addMenuItem(new MenuItem("Masala Khichdi",        75.0,  true, CuisineType.INDIAN));
+        r1.addMenuItem(new MenuItem("Gujarati Thali",        180.0, true, CuisineType.GUJARATI));
+        r1.addMenuItem(new MenuItem("Methi Thepla",          40.0,  true, CuisineType.GUJARATI));
+        r1.addMenuItem(new MenuItem("Aamras Puri",           90.0,  true, CuisineType.GUJARATI));
+        r1.addMenuItem(new MenuItem("Chicken Curry",         160.0, false, CuisineType.INDIAN));
+        r1.addMenuItem(new MenuItem("Veg Noodles",           90.0,  true, CuisineType.CHINESE));
+        r1.addMenuItem(new MenuItem("Gobi Manchurian",       100.0, true, CuisineType.CHINESE));
         restaurantRepository.addRestaurant(r1);
 
         Restaurant r2 = RestaurantFactory.createRestaurant("Surat Locha Corner",       "9000111002", "Surat");
-        r2.addMenuItem(new MenuItem("Surat Locha",           50.0,  true));
-        r2.addMenuItem(new MenuItem("Ghari Mithai",          120.0, true));
-        r2.addMenuItem(new MenuItem("Undhiyu",               150.0, true));
-        r2.addMenuItem(new MenuItem("Vada",             60.0,  true));
-        r2.addMenuItem(new MenuItem("Surti Papdi Chaat",     70.0,  true));
-        r2.addMenuItem(new MenuItem("Mutton Biryani",        220.0, false));
+        r2.addMenuItem(new MenuItem("Surat Locha",           50.0,  true, CuisineType.STREET_FOOD));
+        r2.addMenuItem(new MenuItem("Ghari Mithai",          120.0, true, CuisineType.GUJARATI));
+        r2.addMenuItem(new MenuItem("Undhiyu",               150.0, true, CuisineType.GUJARATI));
+        r2.addMenuItem(new MenuItem("Vada",                  60.0,  true, CuisineType.STREET_FOOD));
+        r2.addMenuItem(new MenuItem("Surti Papdi Chaat",     70.0,  true, CuisineType.STREET_FOOD));
+        r2.addMenuItem(new MenuItem("Mutton Biryani",        220.0, false, CuisineType.INDIAN));
+        r2.addMenuItem(new MenuItem("Margherita Pizza",      150.0, true, CuisineType.ITALIAN));
+        r2.addMenuItem(new MenuItem("Pasta Primavera",       160.0, true, CuisineType.ITALIAN));
         restaurantRepository.addRestaurant(r2);
 
         Restaurant r3 = RestaurantFactory.createRestaurant("Ahmedabad Adda",   "9000111003", "Ahmedabad");
-        r3.addMenuItem(new MenuItem("Sev Usal",              55.0,  true));
-        r3.addMenuItem(new MenuItem("Dabeli",                30.0,  true));
-        r3.addMenuItem(new MenuItem("Fafda Jalebi Combo",   80.0,  true));
-        r3.addMenuItem(new MenuItem("Kachori",               25.0,  true));
-        r3.addMenuItem(new MenuItem("Handvo",                65.0,  true));
-        r3.addMenuItem(new MenuItem("Chicken Sandwich",      130.0, false));
+        r3.addMenuItem(new MenuItem("Sev Usal",              55.0,  true, CuisineType.STREET_FOOD));
+        r3.addMenuItem(new MenuItem("Dabeli",                30.0,  true, CuisineType.STREET_FOOD));
+        r3.addMenuItem(new MenuItem("Fafda Jalebi Combo",    80.0,  true, CuisineType.GUJARATI));
+        r3.addMenuItem(new MenuItem("Kachori",               25.0,  true, CuisineType.STREET_FOOD));
+        r3.addMenuItem(new MenuItem("Handvo",                65.0,  true, CuisineType.GUJARATI));
+        r3.addMenuItem(new MenuItem("Chicken Sandwich",      130.0, false, CuisineType.FAST_FOOD));
+        r3.addMenuItem(new MenuItem("Margherita Pizza",      150.0, true, CuisineType.ITALIAN));
+        r3.addMenuItem(new MenuItem("Veg Noodles",           90.0,  true, CuisineType.CHINESE));
         restaurantRepository.addRestaurant(r3);
 
         System.out.println("------------------------------------------");

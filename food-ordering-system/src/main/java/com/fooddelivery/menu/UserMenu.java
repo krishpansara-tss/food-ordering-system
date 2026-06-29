@@ -1,5 +1,6 @@
 package com.fooddelivery.menu;
 
+import com.fooddelivery.enums.CuisineType;
 import com.fooddelivery.exceptions.MenuItemNotFoundException;
 import com.fooddelivery.interfaces.PaymentMode;
 import com.fooddelivery.model.CartItem;
@@ -37,17 +38,19 @@ public class UserMenu {
         while (true) {
             System.out.println("\n--- Customer Portal ---");
             System.out.println("1. View Available Restaurants (In your City)");
-            System.out.println("2. View Restaurant Menu");
-            System.out.println("3. Add Item to Cart");
-            System.out.println("4. View Cart");
-            System.out.println("5. Remove from the cart");
-            System.out.println("6. Place Order");
-            System.out.println("7. View Order History");
-            System.out.println("8. Expand Order by Id");
-            System.out.println("9. All Restaurant List");
-            System.out.println("10. Log out");
+            System.out.println("2. View Restaurant Menu (All Items)");
+            System.out.println("3. View Restaurant Menu by Cuisine");
+            System.out.println("4. Add Item to Cart");
+            System.out.println("5. View Cart");
+            System.out.println("6. Remove from the cart");
+            System.out.println("7. Place Order");
+            System.out.println("8. View Order History");
+            System.out.println("9. Expand Order by Id");
+            System.out.println("10. Check Order Status");
+            System.out.println("11. All Restaurant List");
+            System.out.println("12. Log out");
 
-            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 10);
+            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 12);
 
             switch (choice) {
                 // view available restaurant (in your city)
@@ -65,8 +68,26 @@ public class UserMenu {
                     }
                     break;
 
-                // add item to the cart
+                // view restaurant menu by cuisine
                 case 3:
+                    String restIdCuisine = InputClass.readString(scanner, "Enter Restaurant ID (e.g., REST-1001): ").toUpperCase();
+                    System.out.println("Select Cuisine Type:");
+                    CuisineType[] cTypes = CuisineType.values();
+                    for (int i = 0; i < cTypes.length; i++) {
+                        System.out.println((i + 1) + ". " + cTypes[i]);
+                    }
+                    int cChoice = InputClass.readInt(scanner, "Enter option (1-" + cTypes.length + "): ", 1, cTypes.length);
+                    CuisineType cuisineToFilter = cTypes[cChoice - 1];
+
+                    try {
+                        restaurantService.displayRestaurantMenuByCuisine(restIdCuisine, cuisineToFilter);
+                    } catch (Exception e) {
+                        System.out.println("Error: " + e.getMessage());
+                    }
+                    break;
+
+                // add item to the cart
+                case 4:
                     String cartRestId = InputClass.readString(scanner, "Enter Restaurant ID: ").toUpperCase();
                     String itemId = InputClass.readString(scanner, "Enter Menu Item ID (e.g., ITEM-1001): ").toUpperCase();
                     int quantity = InputClass.readInt(scanner, "Enter Quantity: ", 1, 100);
@@ -79,12 +100,12 @@ public class UserMenu {
                     break;
 
                 // view cart
-                case 4:
+                case 5:
                     cartService.viewCart(customer);
                     break;
 
                 // modify the cart
-                case 5:
+                case 6:
                     String menuItemId = InputClass.readString(scanner, "Enter Menu Item ID (e.g., ITEM-1001): ").toUpperCase();
                     int quantityToRemove = InputClass.readInt(scanner, "Enter Quantity to Remove from the Cart\n If you enter the quantity more then current quantity the item will be removed from the cart: ", 1, 100);
                     try{
@@ -97,7 +118,7 @@ public class UserMenu {
                     break;
 
                 // place order
-                case 6:
+                case 7:
                     System.out.println("\nSelect Payment Method:");
                     System.out.println("1. Card Payment");
                     System.out.println("2. UPI Payment");
@@ -124,19 +145,14 @@ public class UserMenu {
                     break;
 
                 // display all order history
-                case 7:
+                case 8:
                     orderService.displayOrderHistory(customer);
                     break;
 
                 // display specific order detail
-                case 8:
+                case 9:
                     String orderId = InputClass.readString(scanner, "Enter Order ID (e.g., ORD-1001): ");
                     orderService.displayOrderById(customer, orderId);
-                    break;
-
-                // display all restaurants
-                case 9:
-                    restaurantService.displayAllRestaurant();
                     break;
 
                 // order status
@@ -147,16 +163,20 @@ public class UserMenu {
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }
+                    break;
 
+                // display all restaurants
+                case 11:
+                    restaurantService.displayAllRestaurant();
                     break;
 
                 // logout
-                case 11:
+                case 12:
                     System.out.println("Logging out Customer session...");
                     return;
 
                 default:
-                    System.out.println("Invalid choice. Please select from 1-10.");
+                    System.out.println("Invalid choice. Please select from 1-12.");
             }
         }
     }

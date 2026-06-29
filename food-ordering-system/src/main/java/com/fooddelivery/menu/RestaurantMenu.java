@@ -1,5 +1,6 @@
 package com.fooddelivery.menu;
 
+import com.fooddelivery.enums.CuisineType;
 import com.fooddelivery.enums.OrderStatus;
 import com.fooddelivery.exceptions.RestaurantNotFoundException;
 import com.fooddelivery.model.MenuItem;
@@ -47,8 +48,16 @@ public class RestaurantMenu {
                     double price = InputClass.readDouble(scanner, "Enter Price of the Item: ", 0);
                     boolean isVeg = InputClass.readBoolean(scanner, "Is it Veg? (true/false): ");
 
+                    System.out.println("Select Cuisine Type:");
+                    CuisineType[] cuisineTypes = CuisineType.values();
+                    for (int i = 0; i < cuisineTypes.length; i++) {
+                        System.out.println((i + 1) + ". " + cuisineTypes[i]);
+                    }
+                    int cuisineChoice = InputClass.readInt(scanner, "Enter option (1-" + cuisineTypes.length + "): ", 1, cuisineTypes.length);
+                    CuisineType cuisineType = cuisineTypes[cuisineChoice - 1];
+
                     try {
-                        restaurantService.addItemToRestaurant(restaurant.getRestaurantId(), itemName, price, isVeg);
+                        restaurantService.addItemToRestaurant(restaurant.getRestaurantId(), itemName, price, isVeg, cuisineType);
                     } catch (Exception e) {
                         System.out.println("Error adding menu item: " + e.getMessage());
                     }
@@ -75,15 +84,24 @@ public class RestaurantMenu {
                         break;
                     }
 
-                    System.out.println("Current Details: " + item.getItemName() + " | Price: ₹" + item.getPrice() + " | Type: " + (item.isVeg() ? "VEG" : "NON-VEG"));
+                    System.out.println("Current Details: " + item.getItemName() + " | Price: ₹" + item.getPrice() + " | Type: " + (item.isVeg() ? "VEG" : "NON-VEG") + " | Cuisine: " + item.getCuisineType());
                     
                     String newName = InputClass.readString(scanner, "Enter new Item Name (or type same name to keep): ");
                     double newPrice = InputClass.readDouble(scanner, "Enter new Price: ", 0);
                     boolean newVeg = InputClass.readBoolean(scanner, "Is it Veg? (true/false): ");
 
+                    System.out.println("Select New Cuisine Type (Current: " + item.getCuisineType() + "):");
+                    CuisineType[] cuisines = CuisineType.values();
+                    for (int i = 0; i < cuisines.length; i++) {
+                        System.out.println((i + 1) + ". " + cuisines[i]);
+                    }
+                    int choiceCuisine = InputClass.readInt(scanner, "Enter option (1-" + cuisines.length + "): ", 1, cuisines.length);
+                    CuisineType newCuisine = cuisines[choiceCuisine - 1];
+
                     item.setItemName(newName);
                     item.setPrice(newPrice);
                     item.setVeg(newVeg);
+                    item.setCuisineType(newCuisine);
                     System.out.println("Menu item updated successfully!");
                     break;
 

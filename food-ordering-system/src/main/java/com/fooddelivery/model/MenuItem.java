@@ -1,5 +1,6 @@
 package com.fooddelivery.model;
 
+import com.fooddelivery.enums.CuisineType;
 
 public class MenuItem {
     private static long itemCount = 1000;
@@ -7,12 +8,18 @@ public class MenuItem {
     private String itemName;
     private double price;
     private boolean isVeg;
+    private CuisineType cuisineType;
 
     public MenuItem(String itemName, double price, boolean isVeg) {
+        this(itemName, price, isVeg, CuisineType.INDIAN);
+    }
+
+    public MenuItem(String itemName, double price, boolean isVeg, CuisineType cuisineType) {
         this.menuItemId = "ITEM-" + (++itemCount);
         this.itemName = itemName;
         this.price = price;
         this.isVeg = isVeg;
+        this.cuisineType = cuisineType;
     }
 
     public String getItemName() {
@@ -41,5 +48,13 @@ public class MenuItem {
 
     public String getMenuItemId() {
         return menuItemId;
+    }
+
+    public CuisineType getCuisineType() {
+        return cuisineType;
+    }
+
+    public void setCuisineType(CuisineType cuisineType) {
+        this.cuisineType = cuisineType;
     }
 }

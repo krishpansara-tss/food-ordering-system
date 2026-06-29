@@ -1,5 +1,6 @@
 package com.fooddelivery.services;
 
+import com.fooddelivery.enums.CuisineType;
 import com.fooddelivery.exceptions.InvalidUserCredentialsException;
 import com.fooddelivery.exceptions.ItemAlreadyExist;
 import com.fooddelivery.exceptions.RestaurantNotFoundException;
@@ -74,6 +75,10 @@ public class RestaurantService {
     }
 
     public void addItemToRestaurant(String restaurantId, String itemName, double price, boolean isVeg){
+        addItemToRestaurant(restaurantId, itemName, price, isVeg, CuisineType.INDIAN);
+    }
+
+    public void addItemToRestaurant(String restaurantId, String itemName, double price, boolean isVeg, CuisineType cuisineType){
         Restaurant restaurant = restaurantRepository.findRestaurantById(restaurantId);
 
         if(restaurant == null){
@@ -86,11 +91,11 @@ public class RestaurantService {
             }
         }
 
-        MenuItem menuItem = new MenuItem(itemName, price, isVeg);
+        MenuItem menuItem = new MenuItem(itemName, price, isVeg, cuisineType);
 
         restaurant.addMenuItem(menuItem);
 
-        System.out.println("Menu item with ID: " + menuItem.getMenuItemId() + " added successfully in Restaurant: " + restaurantId);
+        System.out.println("Menu item with ID: " + menuItem.getMenuItemId() + " added successfully (Cuisine: " + cuisineType + ") in Restaurant: " + restaurantId);
     }
 
     public void displayRestaurantMenu(String restaurantId){
@@ -107,12 +112,42 @@ public class RestaurantService {
         }
 
         System.out.println("\n========= MENU FOR: " + restaurant.getRestaurantName().toUpperCase() + " =========");
-        System.out.printf("%-10s %-20s %-10s %-10s\n", "ID", "Item Name", "Price", "Type");
-        System.out.println("---------------------------------------------------------");
+        System.out.printf("%-10s %-25s %-10s %-10s %-15s\n", "ID", "Item Name", "Price", "Type", "Cuisine");
+        System.out.println("-------------------------------------------------------------------------");
         for(MenuItem item : restaurantMenuItemList.values()){
             String type = item.isVeg() ? "VEG" : "NON-VEG";
-            System.out.printf("%-10s %-20s ₹%-9.2f %-10s\n", item.getMenuItemId(), item.getItemName(), item.getPrice(), type);
+            System.out.printf("%-10s %-25s ₹%-9.2f %-10s %-15s\n", item.getMenuItemId(), item.getItemName(), item.getPrice(), type, item.getCuisineType());
         }
-        System.out.println("=========================================================");
+        System.out.println("=========================================================================");
+    }
+
+    public void displayRestaurantMenuByCuisine(String restaurantId, CuisineType cuisineType){
+        Restaurant restaurant = restaurantRepository.findRestaurantById(restaurantId);
+        if(restaurant == null){
+            throw new RestaurantNotFoundException("Restaurant Not Found: Restaurant with ID [" + restaurantId + "] not found.");
+        }
+
+        Map<String, MenuItem> restaurantMenuItemList = restaurant.getMenuItemList();
+
+        if(restaurantMenuItemList == null || restaurantMenuItemList.isEmpty()){
+            System.out.println("Menu not available or might not be added.");
+            return;
+        }
+
+        boolean found = false;
+        System.out.println("\n========= " + cuisineType + " MENU FOR: " + restaurant.getRestaurantName().toUpperCase() + " =========");
+        System.out.printf("%-10s %-25s %-10s %-10s %-15s\n", "ID", "Item Name", "Price", "Type", "Cuisine");
+        System.out.println("-------------------------------------------------------------------------");
+        for(MenuItem item : restaurantMenuItemList.values()){
+            if (item.getCuisineType() == cuisineType) {
+                String type = item.isVeg() ? "VEG" : "NON-VEG";
+                System.out.printf("%-10s %-25s ₹%-9.2f %-10s %-15s\n", item.getMenuItemId(), item.getItemName(), item.getPrice(), type, item.getCuisineType());
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("No items found under " + cuisineType + " cuisine.");
+        }
+        System.out.println("=========================================================================");
     }
 }

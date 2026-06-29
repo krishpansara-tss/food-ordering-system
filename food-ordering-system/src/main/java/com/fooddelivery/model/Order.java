@@ -4,7 +4,6 @@ import com.fooddelivery.enums.OrderStatus;
 import com.fooddelivery.interfaces.PaymentMode;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class Order {
     private static long orderCount = 1000;
@@ -33,9 +32,6 @@ public class Order {
         this.appliedDiscount = builder.appliedDiscount;
         this.finalAmount = builder.finalAmount;
         this.paymentMode = builder.paymentMode;
-        this.orderStatus = builder.orderStatus != null
-                ? builder.orderStatus
-                : OrderStatus.PREPARING;
     }
 
     public static class Builder{
