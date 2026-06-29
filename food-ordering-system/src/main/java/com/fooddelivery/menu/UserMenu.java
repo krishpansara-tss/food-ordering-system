@@ -35,11 +35,11 @@ public class UserMenu {
 
         while (true) {
             System.out.println("\n--- Customer Portal ---");
-            System.out.println("1. View Available Restaurants");
+            System.out.println("1. View Available Restaurants (In your City)");
             System.out.println("2. View Restaurant Menu");
             System.out.println("3. Add Item to Cart");
             System.out.println("4. View Cart");
-            System.out.println("5. Modify the cart");
+            System.out.println("5. Remove from the cart");
             System.out.println("6. Place Order");
             System.out.println("7. View Order History");
             System.out.println("8. Expand Order by Id");
@@ -91,7 +91,29 @@ public class UserMenu {
 
                 // place order
                 case 6:
-                    orderService.placeOrderFlow(customer, scanner);
+                    System.out.println("\nSelect Payment Method:");
+                    System.out.println("1. Card Payment");
+                    System.out.println("2. UPI Payment");
+                    System.out.println("3. Cash on Delivery (COD)");
+
+                    int paymentChoice = InputClass.readInt(scanner, "Choose option (1-3): ", 1, 3);
+                    PaymentMode paymentMode;
+
+                    switch (paymentChoice) {
+                        case 1:
+                            paymentMode = new CardPayment();
+                            break;
+                        case 2:
+                            paymentMode = new UPIPayment();
+                            break;
+                        case 3:
+                            paymentMode = new CODPayment();
+                            break;
+                        default:
+                            System.out.println("Invalid payment choice. Order cancelled.");
+                            return;
+                    }
+                    orderService.placeOrderFlow(customer, paymentMode);
                     break;
 
                 // display all order history

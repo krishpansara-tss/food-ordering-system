@@ -14,7 +14,6 @@ public class Customer extends User {
         super("CUST-" + (++customerCount), userName, password, phoneNumber, city, UserType.CUSTOMER);
     }
 
-
     public List<Order> getOrderHistory() {
         return orderHistory;
     }

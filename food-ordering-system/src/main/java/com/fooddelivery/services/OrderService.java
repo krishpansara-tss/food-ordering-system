@@ -261,38 +261,20 @@ public class OrderService {
         System.out.println("================================================");
     }
 
-    public void placeOrderFlow(Customer customer, Scanner scanner) {
+    public void placeOrderFlow(Customer customer, PaymentMode paymentMode) {
         if (customer.getCart() == null || customer.getCart().getCartItemMap().isEmpty()) {
             System.out.println("Cannot place order: Your cart is empty.");
             return;
         }
 
-        System.out.println("\nSelect Payment Method:");
-        System.out.println("1. Card Payment");
-        System.out.println("2. UPI Payment");
-        System.out.println("3. Cash on Delivery (COD)");
-
-        int paymentChoice = InputClass.readInt(scanner, "Choose option (1-3): ", 1, 3);
-
-        PaymentMode paymentMode;
-        switch (paymentChoice) {
-            case 1:
-                paymentMode = new CardPayment();
-                break;
-            case 2:
-                paymentMode = new UPIPayment();
-                break;
-            case 3:
-                paymentMode = new CODPayment();
-                break;
-            default:
-                System.out.println("Invalid payment choice. Order cancelled.");
-                return;
+        if(paymentMode == null){
+            System.out.println("You haven't selected any payment mode. Please try again after selecting the Payment Mode.");
+            return;
         }
 
         try {
             placeOrder(customer, paymentMode);
-            System.out.println("Order has been processed successfully!");
+            System.out.println("Order has been placed successfully!");
         } catch (Exception e) {
             System.out.println("Failed to place order: " + e.getMessage());
         }

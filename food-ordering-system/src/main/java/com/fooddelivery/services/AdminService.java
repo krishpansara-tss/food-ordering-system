@@ -10,7 +10,6 @@ import com.fooddelivery.model.User;
 import com.fooddelivery.repository.OrderRepository;
 import com.fooddelivery.repository.UserRepository;
 
-import java.util.List;
 import java.util.Map;
 
 public class AdminService {
@@ -50,7 +49,6 @@ public class AdminService {
 
                 System.out.printf("| %-12s | %-18s | %-18s | %-12s |\n",
                         u.getUserId(), u.getUserName(), accountType, u.getCity());
-
             }
         }
 
@@ -101,19 +99,19 @@ public class AdminService {
         System.out.println("             GLOBAL APP OPERATIONS METRICS          ");
         System.out.println("====================================================");
         System.out.println(" FINANCIAL SUMMARY:");
-        System.out.printf("   - Total Revenue Earned     : ₹%.2f\n", totalGrossRevenue);
-        System.out.printf("   - Marketing Subsidies/Discounts Paid Out : ₹%.2f\n", totalDiscountsGiven);
-        System.out.printf("   - Avg Order Ticket Value   : ₹%.2f\n", orders.isEmpty() ? 0 : (totalGrossRevenue / orders.size()));
+        System.out.printf("   - Total Revenue Earned           : ₹%.2f\n", totalGrossRevenue);
+        System.out.printf("   - Discounts Paid Out             : ₹%.2f\n", totalDiscountsGiven);
+        System.out.printf("   - Avg Order Value                : ₹%.2f\n", orders.isEmpty() ? 0 : (totalGrossRevenue / orders.size()));
 
         System.out.println("\n LOGISTICS & DISTRIBUTION:");
-        System.out.println("   - Total Orders Logged        : " + orders.size());
-        System.out.println("   - Completed Deliveries       : " + completedDeliveries);
-        System.out.println("   - Active Processing Runs     : " + activeOrders);
+        System.out.println("   - Total Received Orders         : " + orders.size());
+        System.out.println("   - Completed Deliveries          : " + completedDeliveries);
+        System.out.println("   - Active Orders                 : " + activeOrders);
 
         System.out.println("\n NETWORK DEMOGRAPHICS:");
-        System.out.println("   - Total Registered Customers : " + customerCount);
-        System.out.println("   - Onboarded Fleet Partners   : " + partnerCount);
-        System.out.println("   - Active Fleet Fleet Ready   : " + availableDrivers);
+        System.out.println("   - Total Registered Customers    : " + customerCount);
+        System.out.println("   - Onboarded Delivery Partners   : " + partnerCount);
+        System.out.println("   - Available Delivery Partner    : " + availableDrivers);
         System.out.println("====================================================");
     }
 
@@ -149,14 +147,14 @@ public class AdminService {
         System.out.println("             RESTAURANT PERFORMANCE METRICS          ");
         System.out.println("====================================================");
         System.out.println(" FINANCIAL SUMMARY:");
-        System.out.printf("   - Total Revenue Earned     : ₹%.2f\n", totalGrossRevenue);
-        System.out.printf("   - Marketing Subsidies/Discounts Paid Out : ₹%.2f\n", totalDiscountsGiven);
-        System.out.printf("   - Avg Order Ticket Value   : ₹%.2f\n", orderCount == 0 ? 0 : (totalGrossRevenue / orderCount));
+        System.out.printf("   - Total Revenue Earned          : ₹%.2f\n", totalGrossRevenue);
+        System.out.printf("   - Discounts Paid Out            : ₹%.2f\n", totalDiscountsGiven);
+        System.out.printf("   - Avg Order Value               : ₹%.2f\n", orderCount == 0 ? 0 : (totalGrossRevenue / orderCount));
 
         System.out.println("\n LOGISTICS & DISTRIBUTION:");
-        System.out.println("   - Total Orders Logged        : " + orderCount);
-        System.out.println("   - Completed Deliveries       : " + completedDeliveries);
-        System.out.println("   - Active Processing Runs     : " + activeOrders);
+        System.out.println("   - Total Received Orders        : " + orderCount);
+        System.out.println("   - Completed Deliveries         : " + completedDeliveries);
+        System.out.println("   - Active Orders                : " + activeOrders);
 
         System.out.println("====================================================");
     }

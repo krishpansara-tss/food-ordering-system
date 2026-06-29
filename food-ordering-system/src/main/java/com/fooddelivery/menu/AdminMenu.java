@@ -33,12 +33,13 @@ public class AdminMenu {
         while (true) {
             System.out.println("\n--- Admin Control Panel ---");
             System.out.println("1. Add new Admin");
-            System.out.println("2. View All Registered Users");
-            System.out.println("3. View Global App Statistics");
-            System.out.println("4. Display all Restaurant");
-            System.out.println("5. Log out");
+            System.out.println("2. Display all the Admin");
+            System.out.println("3. View All Registered Users");
+            System.out.println("4. View Global App Statistics");
+            System.out.println("5. Display all Restaurant");
+            System.out.println("6. Log out");
 
-            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 5);
+            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 6);
 
             switch (choice) {
                 // add new admin
@@ -56,23 +57,28 @@ public class AdminMenu {
                     }
                     break;
 
-                // display all user
+                // display all admin
                 case 2:
+                    adminService.displayAllAdmin();
+                    break;
+
+                // display all user
+                case 3:
                     userService.displayAllUser();
                     break;
 
                 // display app statistic
-                case 3:
+                case 4:
                     adminService.displayAppStatistics();
                     break;
 
                 // display all restaurant
-                case 4:
+                case 5:
                     restaurantService.displayAllRestaurant();
                     break;
 
                 // logout
-                case 5:
+                case 6:
                     System.out.println("Logging out Admin session...");
                     return;
 

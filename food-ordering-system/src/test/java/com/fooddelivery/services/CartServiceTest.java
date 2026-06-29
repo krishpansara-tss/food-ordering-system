@@ -107,4 +107,51 @@ class CartServiceTest {
         );
     }
 
+    @Test
+    void removeItemFromCart_ExistingItem_ExistingQuantityRemoved(){
+        cartService.addItemToCart(customer, restaurant1.getRestaurantId(), pizza.getMenuItemId(), 1);
+
+        cartService.removeItemFromCart(customer, pizza.getMenuItemId(), 1);
+
+        assertEquals(0, customer.getCart().getCartItemMap().size());
+    }
+
+    @Test
+    void removeItemFromCart_ExistingItem_MoreThanExistingQuantityRemoved(){
+        cartService.addItemToCart(customer, restaurant1.getRestaurantId(), pizza.getMenuItemId(), 3);
+
+        cartService.removeItemFromCart(customer, pizza.getMenuItemId(), 55);
+
+        assertEquals(0, customer.getCart().getCartItemMap().size());
+    }
+
+    @Test
+    void removeItemFromCart_ExistingItem_LessThanExistingQuantityRemoved(){
+        cartService.addItemToCart(customer, restaurant1.getRestaurantId(), pizza.getMenuItemId(), 3);
+
+        cartService.removeItemFromCart(customer, pizza.getMenuItemId(), 1);
+
+        assertEquals(2, customer.getCart().getCartItemMap().get(pizza.getMenuItemId()).getQuantity());
+    }
+
+    @Test
+    void removeItemFromCart_NegativeQuantity(){
+        cartService.addItemToCart(customer, restaurant1.getRestaurantId(), pizza.getMenuItemId(), 3);
+
+        assertThrows(IllegalArgumentException.class, () ->
+                cartService.removeItemFromCart(customer, pizza.getMenuItemId(), -2)
+        );
+    }
+
+    @Test
+    void removeItemFromCart_NonExistingItem(){
+        cartService.addItemToCart(customer, restaurant1.getRestaurantId(), pizza.getMenuItemId(), 3);
+
+        assertThrows(MenuItemNotFoundException.class, () ->
+                cartService.removeItemFromCart(customer, "DMY_ID", 2)
+        );
+    }
+
+
+
 }

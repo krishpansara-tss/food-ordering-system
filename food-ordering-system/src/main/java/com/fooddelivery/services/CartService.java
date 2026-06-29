@@ -2,18 +2,11 @@ package com.fooddelivery.services;
 
 import com.fooddelivery.exceptions.InvalidItemAddedToCart;
 import com.fooddelivery.exceptions.MenuItemNotFoundException;
-import com.fooddelivery.exceptions.UserNotFoundException;
-import com.fooddelivery.interfaces.PaymentMode;
 import com.fooddelivery.model.*;
-import com.fooddelivery.payment.CODPayment;
-import com.fooddelivery.payment.CardPayment;
-import com.fooddelivery.payment.UPIPayment;
 import com.fooddelivery.repository.RestaurantRepository;
 import com.fooddelivery.repository.UserRepository;
-import com.fooddelivery.util.InputClass;
 
 import java.util.Map;
-import java.util.Scanner;
 
 public class CartService {
 
@@ -24,10 +17,6 @@ public class CartService {
     public CartService(UserRepository userRepository, RestaurantRepository restaurantRepository) {
         this.userRepository = userRepository;
         this.restaurantRepository = restaurantRepository;
-    }
-
-    public CartService(UserRepository userRepository) {
-        this.userRepository = userRepository;
     }
 
     public void addItemToCart(Customer customer, String restaurantId, String menuItemId, int quantity){
@@ -56,19 +45,19 @@ public class CartService {
 
             cartItem.setQuantity(oldQuantity + quantity);
 
-            System.out.println("added to card");
         }else{
             CartItem cartItem = new CartItem(menuItem, quantity);
             cartMap.put(menuItemId, cartItem);
-            System.out.println("added to card");
         }
+
+        System.out.println("Menu item with ID: " + menuItemId + " is added to the cart.");
+
     }
 
     public void removeItemFromCart(Customer customer, String menuItemId, int quantity){
         if(quantity <= 0){
             throw new IllegalArgumentException("Quantity can't be negative");
         }
-
 
         Cart cart = customer.getCart();
         Map<String, CartItem> cartMap = cart.getCartItemMap();
