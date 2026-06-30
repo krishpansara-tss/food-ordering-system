@@ -1,17 +1,13 @@
 package com.fooddelivery.services;
 
 import com.fooddelivery.enums.OrderStatusType;
-import com.fooddelivery.exceptions.DeliveryPartnerNotAvailable;
-import com.fooddelivery.exceptions.InvalidOrderException;
-import com.fooddelivery.exceptions.InvalidUserTypeException;
-import com.fooddelivery.exceptions.OrderNotFoundException;
+import com.fooddelivery.exceptions.*;
 import com.fooddelivery.interfaces.PaymentMode;
 import com.fooddelivery.model.*;
 import com.fooddelivery.payment.CODPayment;
 import com.fooddelivery.repository.OrderRepository;
 import com.fooddelivery.repository.RestaurantRepository;
 import com.fooddelivery.repository.UserRepository;
-import com.fooddelivery.state.OrderStateBuilder;
 
 import java.util.*;
 
@@ -201,18 +197,6 @@ public class OrderService {
         System.out.println("=====================================================");
     }
 
-    public Map<String, Order> ordersByRestaurant(String restaurantId){
-        Map<String, Order> allOrders = orderRepository.getOrderMap();
-        Map<String, Order> restaurantOrders = new HashMap<>();
-
-        for (Order order : allOrders.values()) {
-            if (order.getRestaurantId().equalsIgnoreCase(restaurantId)) {
-               restaurantOrders.put(order.getOrderId(), order);
-            }
-        }
-
-        return restaurantOrders;
-    }
 
     public void displayActiveOrdersForRestaurant(String restaurantId) {
         Map<String, Order> orders = orderRepository.getOrderMap();
@@ -318,6 +302,7 @@ public class OrderService {
         System.out.println("Restaurant   : " + order.getRestaurantName());
         System.out.println("Customer     : " + order.getCustomer().getUserName());
         System.out.println("Status       : " + order.getOrderStatus());
+        System.out.println("Payment Mode : " + order.getPaymentMode());
         System.out.println("Items:");
         for (CartItem ci : order.getListOfItem().getCartItemMap().values()) {
             System.out.printf("  - %-20s x %d\n", ci.getMenuItem().getItemName(), ci.getQuantity());

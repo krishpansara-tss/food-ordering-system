@@ -11,6 +11,7 @@ import com.fooddelivery.services.OrderService;
 import com.fooddelivery.services.RestaurantService;
 import com.fooddelivery.util.InputClass;
 
+import java.util.Map;
 import java.util.Scanner;
 
 public class RestaurantMenu {
@@ -33,11 +34,12 @@ public class RestaurantMenu {
             System.out.println("2. Display Menu");
             System.out.println("3. Update Menu Item Details");
             System.out.println("4. View Restaurant Statistics");
-            System.out.println("5. View Active Orders");
-            System.out.println("6. Update Order Status");
-            System.out.println("7. Log out");
+            System.out.println("5. View All Orders");
+            System.out.println("6. View Active orders");
+            System.out.println("7. Update Order Status");
+            System.out.println("8. Log out");
 
-            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 8);
+            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 9);
 
             switch (choice) {
                 // add item to restaurant menu
@@ -113,11 +115,12 @@ public class RestaurantMenu {
                     orderService.displayAllOrdersForRestaurant(restaurant.getRestaurantId());
                     break;
 
-                // update order status
+                // active
                 case 6:
                     orderService.displayActiveOrdersForRestaurant(restaurant.getRestaurantId());
                     break;
 
+                // update order status
                 case 7:
                     System.out.println("\n--- Update Order Status ---");
                     String orderId = InputClass.readString(scanner, "Enter Order ID (e.g. ORD-1001): ").toUpperCase().trim();

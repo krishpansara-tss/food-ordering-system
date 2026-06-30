@@ -149,7 +149,7 @@ public class AdminService {
         System.out.println(" FINANCIAL SUMMARY:");
         System.out.printf("   - Total Revenue Earned          : ₹%.2f\n", totalGrossRevenue);
         System.out.printf("   - Discounts Paid Out            : ₹%.2f\n", totalDiscountsGiven);
-        System.out.printf("   - Avg Order Value               : ₹%.2f\n", orderCount == 0 ? 0 : (totalGrossRevenue / orderCount));
+        System.out.printf("   - Avg Order Value               : ₹%.2f\n", totalGrossRevenue / orderCount);
 
         System.out.println("\n LOGISTICS & DISTRIBUTION:");
         System.out.println("   - Total Received Orders        : " + orderCount);
