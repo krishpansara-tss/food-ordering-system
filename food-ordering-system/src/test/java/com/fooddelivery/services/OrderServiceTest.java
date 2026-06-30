@@ -49,11 +49,11 @@ class OrderServiceTest {
         dpRajkot = new DeliveryPartner("Nilesh",  "123",  "9988000001", "Rajkot");
         dpSurat     = new DeliveryPartner("Krish",   "123",  "9988000002", "Surat");
         
-        restaurantRajkot = new Restaurant("Manek Chowk", "9000001111", "Rajkot");
+        restaurantRajkot = new Restaurant("Manek Chowk", "123","9000001111", "Rajkot");
         pizza = new MenuItem("Gujarati Thali", 200.0, true);
         restaurantRajkot.addMenuItem(pizza);
 
-        restaurantSurat = new Restaurant("Surat Locha Corner", "9000002222", "Surat");
+        restaurantSurat = new Restaurant("Surat Locha Corner", "123", "9000002222", "Surat");
         locha = new MenuItem("Surat Locha", 50.0, true);
         restaurantSurat.addMenuItem(locha);
         

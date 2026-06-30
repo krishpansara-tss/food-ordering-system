@@ -20,7 +20,7 @@ public class UserFactory {
         }
     }
 
-    public static User createAdmin(String name, String password, String phoneNumber, String city){
-        return new Admin(name, password, phoneNumber, city);
+    public static User createAdmin(UserType userType, String name, String password, String phoneNumber, String city){
+        return new Admin(name, password, phoneNumber, city, userType);
     }
 }

@@ -21,8 +21,8 @@ public class AdminService {
         this.userRepository = userRepository;
     }
 
-    public User addAdmin(String userName, String password, String phoneNumber, String city){
-        User newAdmin = UserFactory.createAdmin(userName, password, phoneNumber, city);
+    public User addAdmin(String userName, String password, String phoneNumber, String city, UserType userType){
+        User newAdmin = UserFactory.createAdmin(userType, userName, password, phoneNumber, city);
 
         userRepository.addUser(newAdmin);
 

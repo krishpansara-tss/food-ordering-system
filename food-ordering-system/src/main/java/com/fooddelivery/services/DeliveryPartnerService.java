@@ -1,5 +1,6 @@
 package com.fooddelivery.services;
 
+import com.fooddelivery.exceptions.DeliveryPartnerNotAvailable;
 import com.fooddelivery.model.DeliveryPartner;
 import com.fooddelivery.model.Order;
 
@@ -21,5 +22,19 @@ public class DeliveryPartnerService {
             }
             System.out.println("====================================================");
         }
+    }
+
+    public void displayDeliveryPartnerStatistic(DeliveryPartner deliveryPartner){
+        if(deliveryPartner == null){
+            throw new DeliveryPartnerNotAvailable("Delivery Partner not found");
+        }
+
+        System.out.println("\n================ YOUR Statistic ================");
+        System.out.println("Delivery Partner ID     : " + deliveryPartner.getUserId());
+        System.out.println("Delivery Name           : " + deliveryPartner.getUserName());
+        System.out.println("Total Assigned Orders   : " + deliveryPartner.getAssignedOrderList().size());
+        System.out.println("Current Active Order ID : " + deliveryPartner.getCurrentOrder().getOrderId());
+        System.out.println("Total Earnings          : " + deliveryPartner.getEarning());
+        System.out.println("Current Status          : " + (deliveryPartner.isAvailable() ? "AVAILABLE" : "BUSY"));
     }
 }

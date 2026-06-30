@@ -5,6 +5,8 @@ import com.fooddelivery.exceptions.InvalidUserCredentialsException;
 import com.fooddelivery.exceptions.InvalidUserTypeException;
 import com.fooddelivery.exceptions.UserNotFoundException;
 import com.fooddelivery.factory.UserFactory;
+import com.fooddelivery.model.Customer;
+import com.fooddelivery.model.Order;
 import com.fooddelivery.model.User;
 import com.fooddelivery.repository.UserRepository;
 
@@ -33,7 +35,7 @@ public class UserService {
     public User login(String userId, String password, UserType userType){
         User user = userRepository.findUserById(userId.toUpperCase());
         if(user == null){
-            throw new UserNotFoundException("Login Failed: User with ID [" + userId + "] not found.");
+            throw new UserNotFoundException("Login Failed: User with ID: " + userId + " not found.");
         }
 
         if(!(user.getPassword().equals(password))){
@@ -68,5 +70,29 @@ public class UserService {
         }
 
         System.out.println("=====================================================================");
+    }
+
+    public void getCustomerStatistic(Customer customer){
+        if(customer == null){
+            throw new UserNotFoundException("Customer having ID: " + customer.getUserId() + " not found");
+        }
+
+        double totalSpendAfterDiscount = 0;
+        double discountApplied = 0;
+        double actualBillAmount= 0;
+
+        for(Order o : customer.getOrderHistory()){
+            discountApplied += o.getAppliedDiscount();
+            actualBillAmount += o.getTotalAmount();
+            totalSpendAfterDiscount += o.getFinalAmount();
+        }
+
+        System.out.println("\n================ YOUR Statistic ================");
+        System.out.println("Customer ID                  : " + customer.getUserId());
+        System.out.println("Customer Name                : " + customer.getUserName());
+        System.out.println("Total Orders                 : " + customer.getOrderHistory().size());
+        System.out.println("Actual Bill                  : ₹" + actualBillAmount);
+        System.out.println("You saved                    : ₹" + discountApplied);
+        System.out.println("Total Spend After discount   : ₹" + totalSpendAfterDiscount);
     }
 }

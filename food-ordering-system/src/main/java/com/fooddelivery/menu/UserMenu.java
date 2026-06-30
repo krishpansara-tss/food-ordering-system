@@ -2,6 +2,7 @@ package com.fooddelivery.menu;
 
 import com.fooddelivery.enums.CuisineType;
 import com.fooddelivery.exceptions.MenuItemNotFoundException;
+import com.fooddelivery.exceptions.UserNotFoundException;
 import com.fooddelivery.interfaces.PaymentMode;
 import com.fooddelivery.model.CartItem;
 import com.fooddelivery.model.Customer;
@@ -12,6 +13,7 @@ import com.fooddelivery.payment.UPIPayment;
 import com.fooddelivery.services.CartService;
 import com.fooddelivery.services.OrderService;
 import com.fooddelivery.services.RestaurantService;
+import com.fooddelivery.services.UserService;
 import com.fooddelivery.util.InputClass;
 
 import java.util.Scanner;
@@ -20,11 +22,13 @@ public class UserMenu {
     private RestaurantService restaurantService;
     private CartService cartService;
     private OrderService orderService;
+    private UserService userService;
 
-    public UserMenu(RestaurantService restaurantService, CartService cartService, OrderService orderService) {
+    public UserMenu(RestaurantService restaurantService, CartService cartService, OrderService orderService, UserService userService) {
         this.restaurantService = restaurantService;
         this.cartService = cartService;
         this.orderService = orderService;
+        this.userService = userService;
     }
 
     public void userMenu(User user, Scanner scanner) {
@@ -48,9 +52,10 @@ public class UserMenu {
             System.out.println("9. Expand Order by Id");
             System.out.println("10. Check Order Status");
             System.out.println("11. All Restaurant List");
-            System.out.println("12. Log out");
+            System.out.println("12. Your Statistic (Spend, save etc.)");
+            System.out.println("13. Log out");
 
-            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 12);
+            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 13);
 
             switch (choice) {
                 // view available restaurant (in your city)
@@ -90,7 +95,7 @@ public class UserMenu {
                 case 4:
                     String cartRestId = InputClass.readString(scanner, "Enter Restaurant ID: ").toUpperCase();
                     String itemId = InputClass.readString(scanner, "Enter Menu Item ID (e.g., ITEM-1001): ").toUpperCase();
-                    int quantity = InputClass.readInt(scanner, "Enter Quantity: ", 1, 100);
+                    int quantity = InputClass.readInt(scanner, "Enter Quantity: ", 1, 10);
 
                     try {
                         cartService.addItemToCart(customer, cartRestId, itemId, quantity);
@@ -170,13 +175,22 @@ public class UserMenu {
                     restaurantService.displayAllRestaurant();
                     break;
 
-                // logout
+                // get statistic
                 case 12:
+                    try{
+                        userService.getCustomerStatistic(customer);
+                    }catch (UserNotFoundException e){
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+
+                // logout
+                case 13:
                     System.out.println("Logging out Customer session...");
                     return;
 
                 default:
-                    System.out.println("Invalid choice. Please select from 1-12.");
+                    System.out.println("Invalid choice. Please select from 1-13.");
             }
         }
     }

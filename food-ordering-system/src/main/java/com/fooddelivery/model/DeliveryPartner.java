@@ -10,9 +10,11 @@ public class DeliveryPartner extends User {
     private boolean isAvailable;
     private Order currentOrder = null;
     private List<Order> assignedOrderList = new ArrayList<>();
+    private double earning;
 
     public DeliveryPartner(String userName, String password, String phoneNumber, String city) {
         super("DELV-" + (++deliveryPartnerCount), userName, password, phoneNumber, city, UserType.DELIVERY_PARTNER);
+        this.earning = 0;
         isAvailable = true;
     }
 
@@ -35,5 +37,13 @@ public class DeliveryPartner extends User {
 
     public List<Order> getAssignedOrderList() {
         return assignedOrderList;
+    }
+
+    public double getEarning() {
+        return earning;
+    }
+
+    public void setEarning(double earning) {
+        this.earning = earning;
     }
 }

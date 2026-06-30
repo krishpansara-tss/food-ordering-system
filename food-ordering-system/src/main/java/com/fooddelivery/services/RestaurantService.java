@@ -20,8 +20,8 @@ public class RestaurantService {
         this.restaurantRepository = restaurantRepository;
     }
 
-    public Restaurant createRestaurant(String restaurantName, String phoneNumber, String city){
-        Restaurant restaurant = RestaurantFactory.createRestaurant(restaurantName, phoneNumber, city);
+    public Restaurant createRestaurant(String restaurantName, String password, String phoneNumber, String city){
+        Restaurant restaurant = RestaurantFactory.createRestaurant(restaurantName, password, phoneNumber, city);
 
         restaurantRepository.addRestaurant(restaurant);
         System.out.println("Restaurant registered successfully! Assigned ID: " + restaurant.getRestaurantId());
@@ -64,7 +64,7 @@ public class RestaurantService {
         System.out.println("\n============== AVAILABLE RESTAURANTS IN " + city.toUpperCase() + " ==============");
         for (Restaurant r : restaurantMap.values()) {
             if (r.getCity().equalsIgnoreCase(city)) {
-                System.out.println("[" + r.getRestaurantId() + "] " + r.getRestaurantName());
+                System.out.println(r.getRestaurantId() + " -> " + r.getRestaurantName());
                 found = true;
             }
         }
@@ -82,7 +82,7 @@ public class RestaurantService {
         Restaurant restaurant = restaurantRepository.findRestaurantById(restaurantId);
 
         if(restaurant == null){
-            throw new RestaurantNotFoundException("Restaurant Not Found: Restaurant with ID [" + restaurantId + "] not found.");
+            throw new RestaurantNotFoundException("Restaurant Not Found: Restaurant with ID:" + restaurantId + " not found.");
         }
 
         for(MenuItem menuItem : restaurant.getMenuItemList().values()){
@@ -101,7 +101,7 @@ public class RestaurantService {
     public void displayRestaurantMenu(String restaurantId){
         Restaurant restaurant = restaurantRepository.findRestaurantById(restaurantId);
         if(restaurant == null){
-            throw new RestaurantNotFoundException("Restaurant Not Found: Restaurant with ID [" + restaurantId + "] not found.");
+            throw new RestaurantNotFoundException("Restaurant Not Found: Restaurant with ID: " + restaurantId + " not found.");
         }
 
         Map<String, MenuItem> restaurantMenuItemList = restaurant.getMenuItemList();
@@ -124,7 +124,7 @@ public class RestaurantService {
     public void displayRestaurantMenuByCuisine(String restaurantId, CuisineType cuisineType){
         Restaurant restaurant = restaurantRepository.findRestaurantById(restaurantId);
         if(restaurant == null){
-            throw new RestaurantNotFoundException("Restaurant Not Found: Restaurant with ID [" + restaurantId + "] not found.");
+            throw new RestaurantNotFoundException("Restaurant Not Found: Restaurant with ID: " + restaurantId + " not found.");
         }
 
         Map<String, MenuItem> restaurantMenuItemList = restaurant.getMenuItemList();

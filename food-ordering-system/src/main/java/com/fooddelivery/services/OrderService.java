@@ -50,6 +50,9 @@ public class OrderService {
 
         double cartTotal = 0;
         for(CartItem cartItem : cartMap.values()){
+            if(cartItem.getQuantity() > 10){
+                throw new InvalidOrderException("Order failed: Maximum item quantity is 10");
+            }
             cartTotal += cartItem.getQuantity() * cartItem.getMenuItem().getPrice();
         }
 
@@ -86,10 +89,9 @@ public class OrderService {
         orderRepository.addOrder(order);
         customer.addOrderHistory(order);
 
-
         assingedDeliveryPartner.setCurrentOrder(order);
         assingedDeliveryPartner.getAssignedOrderList().add(order);
-
+        assingedDeliveryPartner.setEarning(assingedDeliveryPartner.getEarning() + 10.0);
         paymentMode.pay(finalAmount);
 
         printInvoice(order, customer);
@@ -142,9 +144,9 @@ public class OrderService {
         System.out.printf("  Discount Applied:                        -₹%-7.2f  \n", order.getAppliedDiscount());
         System.out.printf("  GRAND TOTAL:                              ₹%-7.2f  \n", order.getFinalAmount());
         System.out.println("+---------------------------------------------------+");
-        System.out.printf("  Payment Mode: %-35s |\n", order.getPaymentMode());
-        System.out.printf("  Assigned Delivery Executive: %-20s |\n", order.getAssingedDeliveryPartner().getUserName());
-        System.out.printf("  Current State: %-34s |\n", order.getOrderStatus());
+        System.out.printf("  Payment Mode: %-35s \n", order.getPaymentMode());
+        System.out.printf("  Assigned Delivery Executive: %-20s \n", order.getAssingedDeliveryPartner().getUserName());
+        System.out.printf("  Current State: %-34s \n", order.getOrderStatus());
         System.out.println("+---------------------------------------------------+");
     }
 

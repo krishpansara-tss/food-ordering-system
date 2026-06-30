@@ -1,4 +1,4 @@
-package com.fooddelivery.menu;
+package com.fooddelivery.menu.restaurant;
 
 import com.fooddelivery.enums.CuisineType;
 import com.fooddelivery.enums.OrderStatusType;
@@ -11,39 +11,46 @@ import com.fooddelivery.services.OrderService;
 import com.fooddelivery.services.RestaurantService;
 import com.fooddelivery.util.InputClass;
 
-import java.util.Map;
 import java.util.Scanner;
 
-public class RestaurantMenu {
+public class RestaurantMenuItemMenu {
     private RestaurantService restaurantService;
     private AdminService adminService;
     private OrderService orderService;
 
-    public RestaurantMenu(RestaurantService restaurantService, AdminService adminService,OrderService orderService) {
+    public RestaurantMenuItemMenu(RestaurantService restaurantService, AdminService adminService,OrderService orderService) {
         this.restaurantService = restaurantService;
         this.adminService = adminService;
         this.orderService = orderService;
     }
 
-    public void restaurantMenu(Restaurant restaurant, Scanner scanner) {
-        System.out.println("Welcome back, Owner: " + restaurant.getRestaurantName());
+    public void restaurantMenuItemMenu(Restaurant restaurant, Scanner scanner) {
+        System.out.println("Welcome to Menu Options");
 
         while (true) {
             System.out.println("\n--- Restaurant Control Panel ---");
-            System.out.println("1. Add Item to Restaurant Menu");
-            System.out.println("2. Display Menu");
+            System.out.println("1. Display Menu");
+            System.out.println("2. Add Item to Restaurant Menu");
             System.out.println("3. Update Menu Item Details");
-            System.out.println("4. View Restaurant Statistics");
-            System.out.println("5. View All Orders");
-            System.out.println("6. View Active orders");
-            System.out.println("7. Update Order Status");
-            System.out.println("8. Log out");
+            System.out.println("4. Back to Main Restaurant Menu");
 
-            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 9);
+            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 4);
 
             switch (choice) {
-                // add item to restaurant menu
+                // display menu / available items
                 case 1:
+                    try {
+                        restaurantService.displayRestaurantMenu(restaurant.getRestaurantId());
+                    } catch (RestaurantNotFoundException e) {
+                        System.out.println("Error: " + e.getMessage());
+                    } catch (Exception e) {
+                        System.out.println("Error: " + e.getMessage());
+                    }
+                    break;
+
+
+                // add item to restaurant menu
+                case 2:
                     String itemName = InputClass.readString(scanner, "Enter Item Name: ");
                     double price = InputClass.readDouble(scanner, "Enter Price of the Item: ", 0);
                     boolean isVeg = InputClass.readBoolean(scanner, "Is it Veg? (true/false): ");
@@ -63,16 +70,6 @@ public class RestaurantMenu {
                     }
                     break;
 
-                // display menu / available items
-                case 2:
-                    try {
-                        restaurantService.displayRestaurantMenu(restaurant.getRestaurantId());
-                    } catch (RestaurantNotFoundException e) {
-                        System.out.println("Error: " + e.getMessage());
-                    } catch (Exception e) {
-                        System.out.println("Error: " + e.getMessage());
-                    }
-                    break;
 
                 // update menu item
                 case 3:
@@ -85,7 +82,7 @@ public class RestaurantMenu {
                     }
 
                     System.out.println("Current Details: " + item.getItemName() + " | Price: ₹" + item.getPrice() + " | Type: " + (item.isVeg() ? "VEG" : "NON-VEG") + " | Cuisine: " + item.getCuisineType());
-                    
+
                     String newName = InputClass.readString(scanner, "Enter new Item Name (or type same name to keep): ");
                     double newPrice = InputClass.readDouble(scanner, "Enter new Price: ", 0);
                     boolean newVeg = InputClass.readBoolean(scanner, "Is it Veg? (true/false): ");
@@ -105,66 +102,13 @@ public class RestaurantMenu {
                     System.out.println("Menu item updated successfully!");
                     break;
 
-                // view restaurant statistics
-                case 4:
-                    adminService.displayRestaurantStatistics(restaurant.getRestaurantId());
-                    break;
-
-                // view all orders
-                case 5:
-                    orderService.displayAllOrdersForRestaurant(restaurant.getRestaurantId());
-                    break;
-
-                // active
-                case 6:
-                    orderService.displayActiveOrdersForRestaurant(restaurant.getRestaurantId());
-                    break;
-
-                // update order status
-                case 7:
-                    System.out.println("\n--- Update Order Status ---");
-                    String orderId = InputClass.readString(scanner, "Enter Order ID (e.g. ORD-1001): ").toUpperCase().trim();
-
-                    Order order = orderService.findOrderById(orderId);
-                    if (order == null || !order.getRestaurantId().equalsIgnoreCase(restaurant.getRestaurantId())) {
-                        System.out.println("Active order with ID: " + orderId + " not found for your restaurant.");
-                        break;
-                    }
-
-                    OrderStatusType current = order.getOrderStatus().getStatus();
-
-                    if(current != OrderStatusType.APPROVED_BY_RESTAURANT){
-                        System.out.println("Current Order Status: " + current);
-                        System.out.println("You don't have access for further status update");
-                        break;
-                    }
-
-                    System.out.println("\nCurrent Order: " + order.getOrderId()
-                            + "  |  Current Order Status:: " + current);
-
-                    OrderStatusType next = null;
-
-                    next = OrderStatusType.READY_FOR_DELIVERY;
-                    boolean changeStatus = InputClass.readBoolean(scanner, "Do you want to change order status to " + next + "? (true/false): ");
-
-                    if(changeStatus) {
-                        try {
-                            orderService.updateOrderStatus(order.getOrderId());
-                        } catch (Exception e) {
-                            System.out.println("Failed to update status: " + e.getMessage());
-                        }
-                    }else{
-                        System.out.println("No changes are made to the Order Status");
-                    }
-                    break;
-
                 // logout
-                case 8:
-                    System.out.println("Logging out Restaurant Owner session...");
+                case 4:
+                    System.out.println("Back to Main Restaurant Owner session...");
                     return;
 
                 default:
-                    System.out.println("Invalid choice. Please select from 1-8.");
+                    System.out.println("Invalid choice. Please select from 1-4.");
             }
         }
     }

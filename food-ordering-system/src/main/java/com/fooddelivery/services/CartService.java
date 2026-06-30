@@ -39,12 +39,14 @@ public class CartService {
             }
         }
 
-        if(cartMap.containsKey(menuItemId)){
+        if(cartMap.containsKey(menuItemId)) {
             CartItem cartItem = cartMap.get(menuItemId);
             int oldQuantity = cartItem.getQuantity();
 
-            cartItem.setQuantity(oldQuantity + quantity);
-
+            if ((oldQuantity + quantity > 10)) {
+                cartItem.setQuantity(10);
+                throw new InvalidItemAddedToCart("Quantity limit exceeded for item " + menuItemId + " (max: 10). Quantity set to 10.");
+            }
         }else{
             CartItem cartItem = new CartItem(menuItem, quantity);
             cartMap.put(menuItemId, cartItem);

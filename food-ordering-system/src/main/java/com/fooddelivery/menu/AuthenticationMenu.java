@@ -31,7 +31,7 @@ public class AuthenticationMenu {
     public void authenticationMenu() {
         Scanner scanner = new Scanner(System.in);
         AdminMenu adminMenu = new AdminMenu(adminService, userService, restaurantService);
-        UserMenu userMenu = new UserMenu(restaurantService, cartService, orderService);
+        UserMenu userMenu = new UserMenu(restaurantService, cartService, orderService, userService);
         RestaurantMenu restaurantMenu = new RestaurantMenu(restaurantService, adminService, orderService);
         DeliveryPartnerMenu deliveryPartnerMenu = new DeliveryPartnerMenu(orderService, deliveryPartnerService);
 
@@ -42,7 +42,7 @@ public class AuthenticationMenu {
             System.out.println("1. Login (Customer/Driver/Admin)");
             System.out.println("2. Register as a Customer");
             System.out.println("3. Join as a Delivery Partner");
-            System.out.println("4. Add Restaurant to Application");
+            System.out.println("4. Register your Restaurant to Our Application");
             System.out.println("5. Go to your Restaurant");
             System.out.println("6. Exit Program");
 
@@ -68,11 +68,12 @@ public class AuthenticationMenu {
 
                     try {
                         User user = userService.login(userId, password, userType);
-                        if (userType == UserType.CUSTOMER) {
+
+                        if (user.getUserType() == UserType.CUSTOMER) {
                             userMenu.userMenu(user, scanner);
-                        } else if (userType == UserType.DELIVERY_PARTNER) {
+                        } else if (user.getUserType() == UserType.DELIVERY_PARTNER) {
                             deliveryPartnerMenu.deliveryPartnerMenu((DeliveryPartner) user, scanner);
-                        } else if (userType == UserType.ADMIN) {
+                        } else if (user.getUserType() == UserType.ADMIN) {
                             adminMenu.adminMenu(user, scanner);
                         }
                     } catch (Exception e) {
@@ -113,10 +114,11 @@ public class AuthenticationMenu {
                 // add restaurant
                 case 4:
                     String restaurantName = InputClass.readString(scanner, "Enter Restaurant Name: ");
+                    String restaurantPassword = InputClass.readString(scanner, "Enter Password of Your  Restaurant: ");
                     String phoneNumber = InputClass.readString(scanner, "Enter Phone Number: ");
                     String city = InputClass.readString(scanner, "Enter City: ");
                     try {
-                        Restaurant restaurant = restaurantService.createRestaurant(restaurantName, phoneNumber, city);
+                        Restaurant restaurant = restaurantService.createRestaurant(restaurantName, restaurantPassword, phoneNumber, city);
                         System.out.println("Please note down your Restaurant ID for future logins: " + restaurant.getRestaurantId());
                     }catch (Exception e){
                         System.out.println("Failed to join with us: " + e.getMessage());

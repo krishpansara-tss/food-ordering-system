@@ -8,13 +8,15 @@ import java.util.Map;
 public class Restaurant {
     private static long restaurantCount = 1000;
     private String restaurantId;
+    private String password;
     private String restaurantName;
     private String phoneNumber;
     private String city;
     private Map<String, MenuItem> menuItemList = new HashMap();
 
-    public Restaurant(String restaurantName, String phoneNumber, String city) {
+    public Restaurant(String restaurantName, String password, String phoneNumber, String city) {
         this.restaurantId = "REST-"  + (++restaurantCount);
+        this.password = password;
         this.restaurantName = restaurantName;
         this.phoneNumber = phoneNumber;
         this.city = city;

@@ -21,14 +21,14 @@ class RestaurantServiceTest {
 
     @Test
     void createRestaurant_AddedToRepository() {
-        restaurantService.createRestaurant("Ganesh", "0987654321", "Rajkot");
+        restaurantService.createRestaurant("Ganesh", "123","0987654321", "Rajkot");
 
         assertEquals(1, restaurantRepository.getRestaurantList().size());
     }
 
     @Test
     void createRestaurant_ObjectVerifying() {
-        Restaurant restaurant = restaurantService.createRestaurant("Ganesh", "0987654321", "Rajkot");
+        Restaurant restaurant = restaurantService.createRestaurant("Ganesh", "123","0987654321", "Rajkot");
 
         assertEquals(restaurant, restaurantRepository.getRestaurantList().get(restaurant.getRestaurantId()));
     }
@@ -36,7 +36,7 @@ class RestaurantServiceTest {
 
     @Test
     void loginIntoRestaurant_Existing() {
-        Restaurant createdrestaurant = restaurantService.createRestaurant("Ganesh", "0987654321", "Rajkot");
+        Restaurant createdrestaurant = restaurantService.createRestaurant("Ganesh", "123","0987654321", "Rajkot");
         Restaurant loggedInRestaurant = restaurantService.loginIntoRestaurant(createdrestaurant.getRestaurantId());
         assertEquals(createdrestaurant, loggedInRestaurant);
     }
@@ -50,7 +50,7 @@ class RestaurantServiceTest {
 
     @Test
     void addItemToRestaurant_ExistingRestaurant() {
-        Restaurant restaurant = restaurantService.createRestaurant("Ganesh", "0987654321", "Rajkot");
+        Restaurant restaurant = restaurantService.createRestaurant("Ganesh", "123","0987654321", "Rajkot");
 
         restaurantService.addItemToRestaurant(restaurant.getRestaurantId(), "Gujarati Dish", 120, true);
 

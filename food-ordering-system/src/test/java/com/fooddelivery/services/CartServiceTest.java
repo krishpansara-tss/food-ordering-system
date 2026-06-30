@@ -29,13 +29,13 @@ class CartServiceTest {
 
         customer = new Customer("Ravi Patel", "ravi@123", "9876543210", "Rajkot");
 
-        restaurant1 = new Restaurant("Mavdi Chowk", "9000000001", "Rajkot");
+        restaurant1 = new Restaurant("Mavdi Chowk", "123", "9000000001", "Rajkot");
         pizza = new MenuItem("Margherita Pizza", 199.0, true);
         burger = new MenuItem("Paneer Burger", 149.0, true);
         restaurant1.addMenuItem(pizza);
         restaurant1.addMenuItem(burger);
 
-        restaurant2 = new Restaurant("Surat Locha Corner", "9000000002", "Surat");
+        restaurant2 = new Restaurant("Surat Locha Corner", "123","9000000002", "Surat");
         MenuItem locha = new MenuItem("Surat Locha", 50.0, true);
         restaurant2.addMenuItem(locha);
 

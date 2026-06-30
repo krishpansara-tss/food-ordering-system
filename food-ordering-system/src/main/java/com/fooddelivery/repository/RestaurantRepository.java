@@ -24,8 +24,8 @@ public class RestaurantRepository {
     }
 
     public MenuItem findMenuById(String itemId){
-        for (Restaurant r : restaurantList.values()) {
-            for (MenuItem item : r.getMenuItemList().values()) {
+        for (Restaurant restaurant : restaurantList.values()) {
+            for (MenuItem item : restaurant.getMenuItemList().values()) {
                 if (item.getMenuItemId().equalsIgnoreCase(itemId)) return item;
             }
         }

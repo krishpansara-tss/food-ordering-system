@@ -44,13 +44,17 @@ public class AdminMenu {
             switch (choice) {
                 // add new admin
                 case 1:
+                    if(admin.getUserType() != UserType.SUPER_ADMIN){
+                        System.out.println("You can't have access to add new Admins.");
+                        break;
+                    }
                     String username = InputClass.readString(scanner, "Enter admin Name: ");
                     String password = InputClass.readString(scanner, "Enter password for admin: ");
                     String phoneNumber = InputClass.readString(scanner, "Enter Phone Number: ");
                     String adminCity = InputClass.readString(scanner, "Enter City: ");
 
                     try {
-                        User newAdmin = adminService.addAdmin(username, password, phoneNumber, adminCity);
+                        User newAdmin = adminService.addAdmin(username, password, phoneNumber, adminCity, UserType.ADMIN);
                         System.out.println("Please note down your admin ID for future logins: " + newAdmin.getUserId());
                     } catch (Exception e) {
                         System.out.println("Registration failed: " + e.getMessage());

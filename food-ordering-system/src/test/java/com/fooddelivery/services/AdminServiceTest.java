@@ -27,21 +27,21 @@ class AdminServiceTest {
     @Test
     void addAdmin_AddedToRepository() {
 
-        adminService.addAdmin("ADMIN1", "1234", "0987654321", "Rajkot");
+        adminService.addAdmin("ADMIN1", "1234", "0987654321", "Rajkot", UserType.ADMIN);
         assertEquals(1, userRepository.getAllUserMap().size());
     }
 
     @Test
     void addAdmin_VarifyingWithId() {
 
-        User admin = adminService.addAdmin("ADMIN1", "1234", "0987654321", "Rajkot");
+        User admin = adminService.addAdmin("ADMIN1", "1234", "0987654321", "Rajkot", UserType.ADMIN);
         assertEquals(admin, userRepository.getAllUserMap().get(admin.getUserId()));
     }
 
     @Test
     void addAdmin_VarifyingTypeOfAdmin() {
 
-        User admin = adminService.addAdmin("ADMIN1", "1234", "0987654321", "Rajkot");
+        User admin = adminService.addAdmin("ADMIN1", "1234", "0987654321", "Rajkot", UserType.ADMIN);
         assertEquals(UserType.ADMIN, admin.getUserType());
     }
 }

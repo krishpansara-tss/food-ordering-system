@@ -15,7 +15,7 @@ public class LoadDummyData {
 
     public static void seed(UserRepository userRepository, RestaurantRepository restaurantRepository) {
 
-        Admin defaultAdmin = Admin.createDefaultAdmin("ADMIN-001", "Super Admin", "admin@123", "9000000000", "Ahmedabad");
+        User defaultAdmin = UserFactory.createAdmin(UserType.SUPER_ADMIN,"Super Admin", "admin@123", "9000000000", "Ahmedabad");
         userRepository.addUser(defaultAdmin);
 
         User c1 = UserFactory.createuser(UserType.CUSTOMER, "Rushi",    "123",   "9876543210", "Rajkot");
@@ -34,7 +34,7 @@ public class LoadDummyData {
         userRepository.addUser(dp2);
         userRepository.addUser(dp3);
 
-        Restaurant r1 = RestaurantFactory.createRestaurant("Mavdi Chowk Khichdi House", "9000111001", "Rajkot");
+        Restaurant r1 = RestaurantFactory.createRestaurant("Mavdi Chowk Khichdi House","123", "9000111001", "Rajkot");
         r1.addMenuItem(new MenuItem("Dal Khichdi",           60.0,  true, CuisineType.INDIAN));
         r1.addMenuItem(new MenuItem("Masala Khichdi",        75.0,  true, CuisineType.INDIAN));
         r1.addMenuItem(new MenuItem("Gujarati Thali",        180.0, true, CuisineType.GUJARATI));
@@ -45,7 +45,7 @@ public class LoadDummyData {
         r1.addMenuItem(new MenuItem("Gobi Manchurian",       100.0, true, CuisineType.CHINESE));
         restaurantRepository.addRestaurant(r1);
 
-        Restaurant r2 = RestaurantFactory.createRestaurant("Surat Locha Corner",       "9000111002", "Surat");
+        Restaurant r2 = RestaurantFactory.createRestaurant("Surat Locha Corner",   "123",    "9000111002", "Surat");
         r2.addMenuItem(new MenuItem("Surat Locha",           50.0,  true, CuisineType.STREET_FOOD));
         r2.addMenuItem(new MenuItem("Ghari Mithai",          120.0, true, CuisineType.GUJARATI));
         r2.addMenuItem(new MenuItem("Undhiyu",               150.0, true, CuisineType.GUJARATI));
@@ -56,7 +56,7 @@ public class LoadDummyData {
         r2.addMenuItem(new MenuItem("Pasta Primavera",       160.0, true, CuisineType.ITALIAN));
         restaurantRepository.addRestaurant(r2);
 
-        Restaurant r3 = RestaurantFactory.createRestaurant("Ahmedabad Adda",   "9000111003", "Ahmedabad");
+        Restaurant r3 = RestaurantFactory.createRestaurant("Ahmedabad Adda","123","9000111003", "Ahmedabad");
         r3.addMenuItem(new MenuItem("Sev Usal",              55.0,  true, CuisineType.STREET_FOOD));
         r3.addMenuItem(new MenuItem("Dabeli",                30.0,  true, CuisineType.STREET_FOOD));
         r3.addMenuItem(new MenuItem("Fafda Jalebi Combo",    80.0,  true, CuisineType.GUJARATI));
@@ -69,15 +69,28 @@ public class LoadDummyData {
 
         System.out.println("------------------------------------------");
         System.out.println("[System] Dummy data loaded successfully!");
-        System.out.println("[System] Default Admin  → ID: ADMIN-001       | Password: admin@123");
-        System.out.println("[System] Customers      → " + c1.getUserId() + " (123)  | "
-                + c2.getUserId() + " (123)");
-        System.out.println("[System]                → " + c3.getUserId() + " (123) | "
-                + c4.getUserId() + " (123)");
-        System.out.println("[System] Delivery       → " + dp1.getUserId() + " (123) | "
-                + dp2.getUserId() + " (123) | " + dp3.getUserId() + " (123)");
-        System.out.println("[System] Restaurants    → " + r1.getRestaurantId() + " (Rajkot) | "
-                + r2.getRestaurantId() + " (Surat) | " + r3.getRestaurantId() + " (Ahmedabad)");
+
+        System.out.println("[System] Default Admin  → ID: "
+                + defaultAdmin.getUserId()
+                + " | Name: " + defaultAdmin.getUserName()
+                + " | Password: admin@123");
+
+        System.out.println("[System] Customers → ");
+        System.out.println("   " + c1.getUserId() + " | " + c1.getUserName() + " (123)");
+        System.out.println("   " + c2.getUserId() + " | " + c2.getUserName() + " (123)");
+        System.out.println("   " + c3.getUserId() + " | " + c3.getUserName() + " (123)");
+        System.out.println("   " + c4.getUserId() + " | " + c4.getUserName() + " (123)");
+
+        System.out.println("[System] Delivery Partners → ");
+        System.out.println("   " + dp1.getUserId() + " | " + dp1.getUserName() + " (123)");
+        System.out.println("   " + dp2.getUserId() + " | " + dp2.getUserName() + " (123)");
+        System.out.println("   " + dp3.getUserId() + " | " + dp3.getUserName() + " (123)");
+
+        System.out.println("[System] Restaurants → ");
+        System.out.println("   " + r1.getRestaurantId() + " | " + r1.getRestaurantName() + " (Rajkot)");
+        System.out.println("   " + r2.getRestaurantId() + " | " + r2.getRestaurantName() + " (Surat)");
+        System.out.println("   " + r3.getRestaurantId() + " | " + r3.getRestaurantName() + " (Ahmedabad)");
+
         System.out.println("------------------------------------------");
     }
 }
