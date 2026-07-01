@@ -27,7 +27,8 @@ public class DPOrderMenu {
             System.out.println("1. View Current Assigned Order");
             System.out.println("2. View All Assigned Orders History");
             System.out.println("3. Update Current Order Status");
-            System.out.println("4. Log out");
+            System.out.println("4. Back to Main Delivery Partner Menu");
+
             int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 4);
 
             switch (choice) {

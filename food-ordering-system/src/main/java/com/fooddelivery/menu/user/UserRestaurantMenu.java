@@ -2,6 +2,7 @@ package com.fooddelivery.menu.user;
 
 import com.fooddelivery.enums.CuisineType;
 import com.fooddelivery.exceptions.MenuItemNotFoundException;
+import com.fooddelivery.exceptions.RestaurantNotFoundException;
 import com.fooddelivery.model.Customer;
 import com.fooddelivery.model.User;
 import com.fooddelivery.services.CartService;
@@ -37,9 +38,10 @@ public class UserRestaurantMenu {
             System.out.println("5. View Cart");
             System.out.println("6. Add Item to Cart");
             System.out.println("7. Remove from the cart");
-            System.out.println("8. Log out");
+            System.out.println("8. Get Contact Details of the Restaurant");
+            System.out.println("9. Back to Main Customer Menu");
 
-            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 8);
+            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 9);
 
             switch (choice) {
                 // view available restaurant (in your city)
@@ -89,7 +91,7 @@ public class UserRestaurantMenu {
                 case 6:
                     String cartRestId = InputClass.readString(scanner, "Enter Restaurant ID: ").toUpperCase();
                     String itemId = InputClass.readString(scanner, "Enter Menu Item ID (e.g., ITEM-1001): ").toUpperCase();
-                    int quantity = InputClass.readInt(scanner, "Enter Quantity: ", 1, 100);
+                    int quantity = InputClass.readInt(scanner, "Enter Quantity: ", 1, 10);
 
                     try {
                         cartService.addItemToCart(customer, cartRestId, itemId, quantity);
@@ -111,13 +113,23 @@ public class UserRestaurantMenu {
                     }
                     break;
 
-                // logout
+                // modify the cart
                 case 8:
+                    String restaurantId = InputClass.readString(scanner, "Enter Restaurant ID (e.g., REST-1001): ").toUpperCase();
+                    try{
+                        restaurantService.getContactDetailsOfRestaurant(restaurantId);
+                    } catch (RestaurantNotFoundException e){
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+
+                // logout
+                case 9:
                     System.out.println("Back to Customer session...");
                     return;
 
                 default:
-                    System.out.println("Invalid choice. Please select from 1-8.");
+                    System.out.println("Invalid choice. Please select from 1-9.");
             }
         }
     }

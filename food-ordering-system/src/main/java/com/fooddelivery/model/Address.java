@@ -1,7 +1,7 @@
 package com.fooddelivery.model;
 
 public class Address {
-    private String label; // e.g. "Home", "Work"
+    private String label;
     private String street;
     private String city;
 

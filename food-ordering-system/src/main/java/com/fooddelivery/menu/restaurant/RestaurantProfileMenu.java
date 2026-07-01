@@ -25,7 +25,7 @@ public class RestaurantProfileMenu {
             System.out.println("\n--- Restaurant Control Panel ---");
             System.out.println("1. Display Menu");
             System.out.println("2. View Restaurant Statistics");
-            System.out.println("3. Log out");
+            System.out.println("3. Back to Main Restaurant Menu");
 
             int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 3);
 

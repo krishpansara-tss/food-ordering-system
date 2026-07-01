@@ -83,11 +83,12 @@ public class AdminMenu {
 
                 // logout
                 case 6:
+                    admin = null;
                     System.out.println("Logging out Admin session...");
                     return;
 
                 default:
-                    System.out.println("Invalid choice. Please select from 1-5.");
+                    System.out.println("Invalid choice. Please select from 1-6.");
 
             }
         }

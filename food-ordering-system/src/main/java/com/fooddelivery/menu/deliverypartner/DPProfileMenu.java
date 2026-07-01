@@ -25,7 +25,8 @@ public class DPProfileMenu {
             System.out.println("1. Check Availability Status");
             System.out.println("2. Toggle Availability (Online/Offline)");
             System.out.println("3. Get Your Statistic");
-            System.out.println("4. Back to Main Menu");
+            System.out.println("4. Back to Main Delivery Partner Menu");
+
             int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 4);
 
             switch (choice) {

@@ -115,4 +115,16 @@ public class UserService {
         customer.addAddress(newAddress);
         return newAddress;
     }
+
+    public void displaySavedAddress(Customer customer){
+        boolean found = false;
+        for (int i = 0; i < customer.getAddresses().size(); i++) {
+            found = true;
+            System.out.println((i + 1) + ". " + customer.getAddresses().get(i));
+        }
+
+        if(!found){
+            System.out.println("No saved Address Found.");
+        }
+    }
 }

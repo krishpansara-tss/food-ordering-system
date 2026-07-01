@@ -52,8 +52,10 @@ public class RestaurantMenu {
 
                 // log out
                 case 4:
+                    restaurant = null;
                     System.out.println("Logging out Restaurant Owner session...");
                     return;
+
                 default:
                     System.out.println("Invalid choice. Please select from 1-4.");
             }

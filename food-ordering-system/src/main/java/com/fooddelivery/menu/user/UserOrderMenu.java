@@ -4,10 +4,12 @@ package com.fooddelivery.menu.user;
 import com.fooddelivery.interfaces.PaymentMode;
 import com.fooddelivery.model.Address;
 import com.fooddelivery.model.Customer;
+import com.fooddelivery.model.Order;
 import com.fooddelivery.model.User;
 import com.fooddelivery.payment.CODPayment;
 import com.fooddelivery.payment.CardPayment;
 import com.fooddelivery.payment.UPIPayment;
+import com.fooddelivery.services.DeliveryPartnerService;
 import com.fooddelivery.services.OrderService;
 import com.fooddelivery.services.UserService;
 import com.fooddelivery.util.InputClass;
@@ -17,10 +19,12 @@ import java.util.Scanner;
 public class UserOrderMenu {
     private OrderService orderService;
     private UserService userService;
+    private DeliveryPartnerService deliveryPartnerService;
 
-    public UserOrderMenu(OrderService orderService, UserService userService) {
+    public UserOrderMenu(OrderService orderService, UserService userService, DeliveryPartnerService deliveryPartnerService) {
         this.orderService = orderService;
         this.userService = userService;
+        this.deliveryPartnerService = deliveryPartnerService;
     }
 
     public void userOrderMenu(User user, Scanner scanner) {
@@ -33,9 +37,10 @@ public class UserOrderMenu {
             System.out.println("2. View Order History");
             System.out.println("3. Expand Order by Id");
             System.out.println("4. Check Order Status");
-            System.out.println("5. Log out");
+            System.out.println("5. Get Delivery Partner Information");
+            System.out.println("6. Back to Main Customer Menu");
 
-            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 5);
+            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 6);
 
             switch (choice) {
                 // place order
@@ -123,13 +128,26 @@ public class UserOrderMenu {
                     }
                     break;
 
-                // logout
+                // contact detail of delivery partner
                 case 5:
+                    orderId = InputClass.readString(scanner, "Enter Order ID (e.g., ORD-1001): ");
+
+                    try{
+                        Order order = orderService.findOrderById(orderId);
+                        deliveryPartnerService.getDeliveryPartnerDetails(order);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+
+                    break;
+
+                // logout
+                case 6:
                     System.out.println("Back to the Customer Menu...");
                     return;
 
                 default:
-                    System.out.println("Invalid choice. Please select from 1-5.");
+                    System.out.println("Invalid choice. Please select from 1-6.");
             }
         }
     }

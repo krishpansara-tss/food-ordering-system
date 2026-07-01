@@ -31,9 +31,10 @@ public class AuthenticationMenu {
     public void authenticationMenu() {
         Scanner scanner = new Scanner(System.in);
         AdminMenu adminMenu = new AdminMenu(adminService, userService, restaurantService);
-        UserMenu userMenu = new UserMenu(restaurantService, cartService, orderService, userService);
+        UserMenu userMenu = new UserMenu(restaurantService, cartService, orderService, userService, deliveryPartnerService);
         RestaurantMenu restaurantMenu = new RestaurantMenu(restaurantService, adminService, orderService);
         DPMenu deliveryPartnerMenu = new DPMenu(orderService, deliveryPartnerService);
+        SuperAdminMenu superAdminMenu = new SuperAdminMenu(adminService, userService, restaurantService);
 
         while (true) {
             System.out.println("\n=============================================");
@@ -58,13 +59,15 @@ public class AuthenticationMenu {
                     System.out.println("1. Customer");
                     System.out.println("2. Delivery Partner");
                     System.out.println("3. Admin");
-                    int typeChoice = InputClass.readInt(scanner, "Enter choice (1-3): ", 1, 3);
+                    System.out.println("4. Super Admin");
+                    int typeChoice = InputClass.readInt(scanner, "Enter choice (1-3): ", 1, 4);
 
                     UserType userType;
 
                     if (typeChoice == 1) userType = UserType.CUSTOMER;
                     else if (typeChoice == 2) userType = UserType.DELIVERY_PARTNER;
-                    else userType = UserType.ADMIN;
+                    else if(typeChoice == 3) userType = UserType.ADMIN;
+                    else userType = UserType.SUPER_ADMIN;
 
                     try {
                         User user = userService.login(userId, password, userType);
@@ -75,6 +78,8 @@ public class AuthenticationMenu {
                             deliveryPartnerMenu.deliveryPartnerMenu((DeliveryPartner) user, scanner);
                         } else if (user.getUserType() == UserType.ADMIN) {
                             adminMenu.adminMenu(user, scanner);
+                        } else if(user.getUserType() == UserType.SUPER_ADMIN){
+                            superAdminMenu.superAdminMenu(user, scanner);
                         }
                     } catch (Exception e) {
                         System.out.println("\nLogin Failed: " + e.getMessage());

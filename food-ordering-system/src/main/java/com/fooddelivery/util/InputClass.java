@@ -92,4 +92,17 @@ public class InputClass {
             return input;
         }
     }
+
+    public static String readPhoneNumber(Scanner scanner, String message) {
+        while (true) {
+            System.out.print(message);
+            String input = scanner.nextLine().trim();
+
+            if (input.matches("^[6-9]\\d{9}$")) {
+                return input;
+            }
+
+            System.out.println("Invalid phone number. Try again.");
+        }
+    }
 }

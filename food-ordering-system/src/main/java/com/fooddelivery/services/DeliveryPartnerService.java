@@ -1,5 +1,6 @@
 package com.fooddelivery.services;
 
+import com.fooddelivery.enums.OrderStatusType;
 import com.fooddelivery.exceptions.DeliveryPartnerNotAvailable;
 import com.fooddelivery.model.DeliveryPartner;
 import com.fooddelivery.model.Order;
@@ -36,5 +37,22 @@ public class DeliveryPartnerService {
         System.out.println("Current Active Order ID : " + deliveryPartner.getCurrentOrder().getOrderId());
         System.out.println("Total Earnings          : " + deliveryPartner.getEarning());
         System.out.println("Current Status          : " + (deliveryPartner.isAvailable() ? "AVAILABLE" : "BUSY"));
+    }
+
+    public void getDeliveryPartnerDetails(Order order){
+        DeliveryPartner deliveryPartner = order.getAssignedDeliveryPartner();
+        if(deliveryPartner == null){
+            throw new DeliveryPartnerNotAvailable("Delivery Partner Not Found");
+        }
+        if(order.getOrderStatus().getStatus() == OrderStatusType.DELIVERED){
+            System.out.println("Your order has been already delivered");
+            return;
+        }
+
+        System.out.println("------ Contact Detail ------");
+        System.out.println("Delivery Partner ID   :" + deliveryPartner.getUserId());
+        System.out.println("Restaurant Name : " + deliveryPartner.getUserName());
+        System.out.println("Contact Number  : " + deliveryPartner.getPhoneNumber());
+        System.out.println("-----------------------------");
     }
 }

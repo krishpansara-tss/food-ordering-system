@@ -27,7 +27,7 @@ public class UserProfileMenu {
             System.out.println("1. View Saved Addresses");
             System.out.println("2. Add New Address");
             System.out.println("3. Your Statistic (Spend, save etc.)");
-            System.out.println("4. Back to Customer session");
+            System.out.println("4. Back to Main Customer Menu");
 
             int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 4);
 
@@ -35,9 +35,8 @@ public class UserProfileMenu {
                 // view saved addresses
                 case 1:
                     System.out.println("\n--- Your Saved Addresses ---");
-                    for (int i = 0; i < customer.getAddresses().size(); i++) {
-                        System.out.println((i + 1) + ". " + customer.getAddresses().get(i));
-                    }
+                    userService.displaySavedAddress(customer);
+
                     break;
 
                 // add new address

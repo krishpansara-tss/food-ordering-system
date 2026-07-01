@@ -23,7 +23,8 @@ public class RestaurantOrderMenu {
             System.out.println("1. View All Orders");
             System.out.println("2. View Active orders");
             System.out.println("3. Update Order Status");
-            System.out.println("4. Log out");
+            System.out.println("4. Back to Main Restaurant Menu");
+
 
             int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 4);
 

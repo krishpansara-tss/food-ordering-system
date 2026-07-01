@@ -24,6 +24,10 @@ public class CartService {
             throw new IllegalArgumentException("Quantity can't be negative");
         }
 
+        if(quantity > 10){
+            throw new InvalidItemAddedToCart("Quantity limit exceeded for item (max: 10). Quantity set to 10.");
+        }
+
         MenuItem menuItem = restaurantRepository.findMenuById(menuItemId);
         if(menuItem == null){
             throw new MenuItemNotFoundException("Menu item with ID: " + menuItemId + " doesn't exist");
@@ -108,6 +112,4 @@ public class CartService {
         System.out.printf("Total Cart Value: ₹%.2f\n", total);
         System.out.println("=============================================");
     }
-
-
 }

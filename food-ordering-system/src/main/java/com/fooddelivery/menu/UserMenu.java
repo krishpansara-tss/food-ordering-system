@@ -15,9 +15,9 @@ public class UserMenu {
     private UserOrderMenu userOrderMenu;
     private UserProfileMenu userProfileMenu;
 
-    public UserMenu(RestaurantService restaurantService, CartService cartService, OrderService orderService, UserService userService) {
+    public UserMenu(RestaurantService restaurantService, CartService cartService, OrderService orderService, UserService userService, DeliveryPartnerService deliveryPartnerService) {
         this.userRestaurantMenu = new UserRestaurantMenu(restaurantService, cartService);
-        this.userOrderMenu = new UserOrderMenu(orderService, userService);
+        this.userOrderMenu = new UserOrderMenu(orderService, userService, deliveryPartnerService);
         this.userProfileMenu = new UserProfileMenu(userService);
     }
 
@@ -56,6 +56,7 @@ public class UserMenu {
 
                 // back to main menu
                 case 4:
+                    user = null;
                     System.out.println("Logging out Customer session...");
                     return;
 

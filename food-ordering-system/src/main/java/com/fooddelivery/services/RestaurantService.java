@@ -151,4 +151,19 @@ public class RestaurantService {
         }
         System.out.println("=========================================================================");
     }
+
+    public void getContactDetailsOfRestaurant(String restaurantId){
+        Restaurant restaurant = restaurantRepository.findRestaurantById(restaurantId);
+
+        if(restaurant == null){
+            throw new RestaurantNotFoundException("Restaurant having ID: " + restaurantId + " not found.");
+        }
+
+        System.out.println("------ Contact Detail ------");
+        System.out.println("Restaurant ID   :" + restaurantId);
+        System.out.println("Restaurant Name : " + restaurant.getRestaurantName());
+        System.out.println("Contact Number  : " + restaurant.getPhoneNumber());
+        System.out.println("-----------------------------");
+
+    }
 }

@@ -7,6 +7,8 @@ import com.fooddelivery.state.PlacedState;
 import com.fooddelivery.state.OrderStateBuilder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Order {
     private static long orderCount = 1000;
@@ -16,7 +18,10 @@ public class Order {
     private String restaurantId;
     private String restaurantName;
     private DeliveryPartner assignedDeliveryPartner = null;
-    private Cart listOfItem = null;
+
+//    private Cart listOfItem = null;
+    private List<OrderItem> listOfOrderItem = new ArrayList<>();
+
     private double totalAmount;
     private double appliedDiscount;
     private double finalAmount;
@@ -31,7 +36,10 @@ public class Order {
         this.restaurantId = builder.restaurantId;
         this.restaurantName = builder.restaurantName;
         this.assignedDeliveryPartner = builder.assignedDeliveryPartner;
-        this.listOfItem = builder.listOfItem;
+
+//        this.listOfItem = builder.listOfItem;
+        this.listOfOrderItem = builder.listOfOrderItem;
+
         this.totalAmount = builder.totalAmount;
         this.appliedDiscount = builder.appliedDiscount;
         this.finalAmount = builder.finalAmount;
@@ -46,7 +54,10 @@ public class Order {
         private String restaurantId;
         private String restaurantName;
         private DeliveryPartner assignedDeliveryPartner;
-        private Cart listOfItem;
+
+//        private Cart listOfItem;
+        private List<OrderItem> listOfOrderItem = new ArrayList<>();
+
         private double totalAmount;
         private double appliedDiscount;
         private double finalAmount;
@@ -70,10 +81,18 @@ public class Order {
             this.assignedDeliveryPartner = assignedDeliveryPartner;
             return this;
         }
-        public Builder listOfItem(Cart listOfItem){
-            this.listOfItem = listOfItem;
+
+
+//        public Builder listOfItem(Cart listOfItem){
+//            this.listOfItem = listOfItem;
+//            return this;
+//        }
+        public Builder orderItem(List<OrderItem> listOfOrderItem){
+            this.listOfOrderItem = listOfOrderItem;
             return this;
         }
+
+
         public Builder totalAmount(double totalAmount){
             this.totalAmount = totalAmount;
             return this;
@@ -137,13 +156,13 @@ public class Order {
         return orderDate;
     }
 
-    public Cart getListOfItem() {
-        return listOfItem;
-    }
-
-    public void setListOfItem(Cart listOfItem) {
-        this.listOfItem = listOfItem;
-    }
+//    public Cart getListOfItem() {
+//        return listOfItem;
+//    }
+//
+//    public void setListOfItem(Cart listOfItem) {
+//        this.listOfItem = listOfItem;
+//    }
 
     public double getTotalAmount() {
         return totalAmount;
@@ -180,5 +199,9 @@ public class Order {
 
     public Address getDeliveryAddress() {
         return deliveryAddress;
+    }
+
+    public List<OrderItem> getListOfOrderItem() {
+        return listOfOrderItem;
     }
 }

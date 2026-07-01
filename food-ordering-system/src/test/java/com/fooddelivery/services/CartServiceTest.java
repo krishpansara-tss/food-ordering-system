@@ -153,5 +153,15 @@ class CartServiceTest {
     }
 
 
+    @Test
+    void addItemToCart_AndThenChangePrice() {
+        cartService.addItemToCart(customer, restaurant1.getRestaurantId(), pizza.getMenuItemId(), 2);
+
+        Cart cart = customer.getCart();
+        assertTrue(cart.getCartItemMap().containsKey(pizza.getMenuItemId()));
+        assertEquals(pizza.getPrice(), cart.getCartItemMap().get(pizza.getMenuItemId()).getMenuItem().getPrice());
+    }
+
+
 
 }

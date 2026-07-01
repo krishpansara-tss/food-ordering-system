@@ -80,13 +80,19 @@ public class OrderService {
         cartSnapshot.setCurrentRestaurantId(cart.getCurrentRestaurantId());
         cartSnapshot.setCartItemMap(new HashMap<>(cart.getCartItemMap()));
 
+        List<OrderItem> orderItemList = new ArrayList<>();
+        for(CartItem cartItem : cartMap.values()){
+            orderItemList.add(new OrderItem(cartItem.getMenuItem(), cartItem.getQuantity()));
+        }
+
         Order order = new Order.Builder()
                 .customer(customer)
                 .restaurantId(restaurantId)
                 .restaurantName(restaurantName)
                 .assignedDeliveryPartner(assignedDeliveryPartner)
-                .listOfItem(cartSnapshot)
+//                .listOfItem(cartSnapshot)
                 .totalAmount(cartTotal)
+                .orderItem(orderItemList)
                 .appliedDiscount(appliedDiscount)
                 .finalAmount(finalAmount)
                 .paymentMode(paymentMode)
@@ -143,10 +149,10 @@ public class OrderService {
         System.out.println("+---------------------------------------------------+");
         System.out.printf(" %-20s | %-4s | %-10s | %-8s \n", "Item Name", "Qty", "Price", "Total");
         System.out.println("+---------------------------------------------------+");
-        for (CartItem ci : order.getListOfItem().getCartItemMap().values()) {
-            double cost = ci.getMenuItem().getPrice() * ci.getQuantity();
+        for (OrderItem oi : order.getListOfOrderItem()) {
+            double cost = oi.getMenuItem().getPrice() * oi.getQuantity();
             System.out.printf(" %-20s | %-4d | ₹%-9.2f | ₹%-7.2f \n",
-                    ci.getMenuItem().getItemName(), ci.getQuantity(), ci.getMenuItem().getPrice(), cost);
+                    oi.getMenuItemName(), oi.getQuantity(), oi.getPriceAtPurchase(), cost);
         }
         System.out.println("+---------------------------------------------------+");
         System.out.printf("  Subtotal:                                 ₹%-7.2f  \n", order.getTotalAmount());
@@ -195,8 +201,8 @@ public class OrderService {
                 System.out.println("Payment    : " + order.getPaymentMode());
                 System.out.println("Items Purchased:");
 
-                for (CartItem ci : order.getListOfItem().getCartItemMap().values()) {
-                    System.out.printf("     - %-15s x %-3d\n", ci.getMenuItem().getItemName(), ci.getQuantity());
+                for (OrderItem oi : order.getListOfOrderItem()) {
+                    System.out.printf("     - %-15s = %-10.2f x %-3d%n", oi.getMenuItemName(), oi.getPriceAtPurchase(), oi.getQuantity());
                 }
 
                 System.out.printf("Final Bill  : ₹%.2f\n", order.getFinalAmount());
@@ -222,8 +228,8 @@ public class OrderService {
                 System.out.println("Amount     : ₹" + order.getFinalAmount());
                 System.out.println("Status     : " + order.getOrderStatus());
                 System.out.println("Items:");
-                for (CartItem ci : order.getListOfItem().getCartItemMap().values()) {
-                    System.out.printf("  - %-20s x %-3d\n", ci.getMenuItem().getItemName(), ci.getQuantity());
+                for (OrderItem oi : order.getListOfOrderItem()) {
+                    System.out.printf("  - %-20s x %-3d\n", oi.getMenuItemName(), oi.getQuantity());
                 }
                 System.out.println("---------------------------------------------------------");
             }
@@ -247,8 +253,8 @@ public class OrderService {
                 System.out.println("Amount     : ₹" + order.getFinalAmount());
                 System.out.println("Status     : " + order.getOrderStatus());
                 System.out.println("Items:");
-                for (CartItem ci : order.getListOfItem().getCartItemMap().values()) {
-                    System.out.printf("  - %-20s x %-3d\n", ci.getMenuItem().getItemName(), ci.getQuantity());
+                for (OrderItem oi : order.getListOfOrderItem()) {
+                    System.out.printf("  - %-20s x %-3d\n", oi.getMenuItemName(), oi.getQuantity());
                 }
                 System.out.println("---------------------------------------------------------");
             }
@@ -271,7 +277,7 @@ public class OrderService {
         Order order = orderRepository.findOrderById(orderId);
 
         if(order == null){
-            throw new OrderNotFoundException("Order with ID [" + orderId + "] not found.");
+            throw new OrderNotFoundException("Order with ID " + orderId + " not found.");
         }
 
         System.out.println("Your order ID       : " + orderId);
@@ -281,11 +287,11 @@ public class OrderService {
     public void updateOrderStatus(String orderId) {
         Order order = findOrderById(orderId);
         if (order == null) {
-            throw new OrderNotFoundException("Order with ID [" + orderId + "] not found.");
+            throw new OrderNotFoundException("Order with ID " + orderId + " not found.");
         }
         OrderStatusType currentStatus = order.getOrderStatus().getStatus();
         if (currentStatus == OrderStatusType.DELIVERED) {
-            System.out.println("Order with ID [" + orderId + "] is already DELIVERED. Cannot update status further.");
+            System.out.println("Order with ID " + orderId + " is already DELIVERED. Cannot update status further.");
             return;
         }
         try{
@@ -307,15 +313,15 @@ public class OrderService {
 
     public void printOrderDetails(Order order) {
         System.out.println("\n============= CURRENT ACTIVE ORDER =============");
-        System.out.println("Order ID     : " + order.getOrderId());
-        System.out.println("Restaurant   : " + order.getRestaurantName());
-        System.out.println("Customer     : " + order.getCustomer().getUserName());
-        System.out.println("Delivery Addr: " + (order.getDeliveryAddress() != null ? order.getDeliveryAddress().toString() : "N/A"));
-        System.out.println("Status       : " + order.getOrderStatus());
-        System.out.println("Payment Mode : " + order.getPaymentMode());
+        System.out.println("Order ID          : " + order.getOrderId());
+        System.out.println("Restaurant        : " + order.getRestaurantName());
+        System.out.println("Customer          : " + order.getCustomer().getUserName());
+        System.out.println("Delivery Address  : " + (order.getDeliveryAddress() != null ? order.getDeliveryAddress().toString() : "N/A"));
+        System.out.println("Status            : " + order.getOrderStatus());
+        System.out.println("Payment Mode      : " + order.getPaymentMode());
         System.out.println("Items:");
-        for (CartItem ci : order.getListOfItem().getCartItemMap().values()) {
-            System.out.printf("  - %-20s x %d\n", ci.getMenuItem().getItemName(), ci.getQuantity());
+        for (OrderItem oi : order.getListOfOrderItem()) {
+            System.out.printf("  - %-20s x %d\n", oi.getMenuItemName(), oi.getQuantity());
         }
         System.out.printf("Total Amount : ₹%.2f\n", order.getFinalAmount());
         System.out.println("================================================");
