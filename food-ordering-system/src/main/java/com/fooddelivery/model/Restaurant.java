@@ -34,6 +34,10 @@ public class Restaurant {
         this.restaurantName = restaurantName;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public String getPhoneNumber() {
         return phoneNumber;
     }

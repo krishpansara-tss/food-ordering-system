@@ -5,6 +5,7 @@ import com.fooddelivery.exceptions.InvalidUserCredentialsException;
 import com.fooddelivery.exceptions.InvalidUserTypeException;
 import com.fooddelivery.exceptions.UserNotFoundException;
 import com.fooddelivery.factory.UserFactory;
+import com.fooddelivery.model.Address;
 import com.fooddelivery.model.Customer;
 import com.fooddelivery.model.Order;
 import com.fooddelivery.model.User;
@@ -74,7 +75,7 @@ public class UserService {
 
     public void getCustomerStatistic(Customer customer){
         if(customer == null){
-            throw new UserNotFoundException("Customer having ID: " + customer.getUserId() + " not found");
+            throw new UserNotFoundException("Customer not found");
         }
 
         double totalSpendAfterDiscount = 0;
@@ -94,5 +95,24 @@ public class UserService {
         System.out.println("Actual Bill                  : ₹" + actualBillAmount);
         System.out.println("You saved                    : ₹" + discountApplied);
         System.out.println("Total Spend After discount   : ₹" + totalSpendAfterDiscount);
+    }
+
+    public Address addAddressToCustomer(Customer customer, String label, String street, String city) {
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer cannot be null");
+        }
+        if (label == null || label.trim().isEmpty()) {
+            throw new IllegalArgumentException("Address label cannot be empty");
+        }
+        if (street == null || street.trim().isEmpty()) {
+            throw new IllegalArgumentException("Street name cannot be empty");
+        }
+        if (city == null || city.trim().isEmpty()) {
+            throw new IllegalArgumentException("City name cannot be empty");
+        }
+
+        Address newAddress = new Address(label.trim(), street.trim(), city.trim());
+        customer.addAddress(newAddress);
+        return newAddress;
     }
 }

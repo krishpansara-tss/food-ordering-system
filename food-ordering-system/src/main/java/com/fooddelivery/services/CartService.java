@@ -47,6 +47,8 @@ public class CartService {
                 cartItem.setQuantity(10);
                 throw new InvalidItemAddedToCart("Quantity limit exceeded for item " + menuItemId + " (max: 10). Quantity set to 10.");
             }
+
+            cartItem.setQuantity(oldQuantity + quantity);
         }else{
             CartItem cartItem = new CartItem(menuItem, quantity);
             cartMap.put(menuItemId, cartItem);

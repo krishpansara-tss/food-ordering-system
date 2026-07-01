@@ -21,7 +21,8 @@ public class Order {
     private double appliedDiscount;
     private double finalAmount;
     private PaymentMode paymentMode = null;
-    public OrderStatus orderStatus;
+    private OrderStatus orderStatus;
+    private Address deliveryAddress = null;
 
     private Order(Builder builder){
         this.orderDate = LocalDateTime.now();
@@ -36,6 +37,7 @@ public class Order {
         this.finalAmount = builder.finalAmount;
         this.paymentMode = builder.paymentMode;
         this.orderStatus = OrderStateBuilder.build(builder.orderStatus);
+        this.deliveryAddress = builder.deliveryAddress;
     }
 
     public static class Builder{
@@ -50,6 +52,7 @@ public class Order {
         private double finalAmount;
         private PaymentMode paymentMode;
         private OrderStatusType orderStatus;
+        private Address deliveryAddress;
 
         public Builder customer(Customer customer){
             this.customer = customer;
@@ -91,6 +94,10 @@ public class Order {
             this.orderStatus = orderStatus;
             return this;
         }
+        public Builder deliveryAddress(Address deliveryAddress){
+            this.deliveryAddress = deliveryAddress;
+            return this;
+        }
 
         public Order build() {
             return new Order(this);
@@ -118,7 +125,7 @@ public class Order {
         return restaurantName;
     }
 
-    public DeliveryPartner getAssingedDeliveryPartner() {
+    public DeliveryPartner getAssignedDeliveryPartner() {
         return assignedDeliveryPartner;
     }
 
@@ -169,5 +176,9 @@ public class Order {
 
     public void setOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public Address getDeliveryAddress() {
+        return deliveryAddress;
     }
 }

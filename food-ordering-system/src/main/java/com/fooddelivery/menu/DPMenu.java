@@ -11,16 +11,13 @@ import com.fooddelivery.util.InputClass;
 import java.util.Scanner;
 
 public class DPMenu {
-        private OrderService orderService;
-        private DeliveryPartnerService deliveryPartnerService;
+        private DPOrderMenu dpOrderMenu;
+        private DPProfileMenu dpProfileMenu;
 
         public DPMenu(OrderService orderService, DeliveryPartnerService deliveryPartnerService) {
-            this.orderService = orderService;
-            this.deliveryPartnerService = deliveryPartnerService;
+            this.dpOrderMenu = new DPOrderMenu(orderService, deliveryPartnerService);
+            this.dpProfileMenu = new DPProfileMenu(deliveryPartnerService);
         }
-
-        private DPOrderMenu dpOrderMenu= new DPOrderMenu(orderService, deliveryPartnerService);
-        private DPProfileMenu dpProfileMenu = new DPProfileMenu(deliveryPartnerService);
 
 
         public void deliveryPartnerMenu(DeliveryPartner partner, Scanner scanner) {
@@ -39,15 +36,15 @@ public class DPMenu {
                 int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 3);
 
                 switch (choice) {
-                    // availability status
+                    // manage profile
                     case 1:
                         dpProfileMenu.deliveryPartnerProfileMenu(partner, scanner);
                         break;
 
-                    // toggle availability
+                    // manage orders
                     case 2:
                         dpOrderMenu.deliveryPartnerOrderMenu(partner, scanner);
-                        partner.setAvailable(!partner.isAvailable());
+                        break;
 
                     // logout
                     case 3:
@@ -55,7 +52,7 @@ public class DPMenu {
                         return;
 
                     default:
-                        System.out.println("Invalid choice. Please select from 1-6.");
+                        System.out.println("Invalid choice. Please select from 1-3.");
                 }
             }
         }

@@ -44,7 +44,9 @@ class OrderServiceTest {
         cartService  = new CartService(userRepository, restaurantRepository);
         
         customerRajkot = new Customer("Ravi",  "123",  "9876540001", "Rajkot");
+        customerRajkot.addAddress(new Address("Primary", "Default Street", "Rajkot"));
         customerSurat = new Customer("Mital",  "123", "9876540002", "Surat");
+        customerSurat.addAddress(new Address("Primary", "Default Street", "Surat"));
         
         dpRajkot = new DeliveryPartner("Nilesh",  "123",  "9988000001", "Rajkot");
         dpSurat     = new DeliveryPartner("Krish",   "123",  "9988000002", "Surat");
@@ -67,7 +69,7 @@ class OrderServiceTest {
 
     private Order placeTestOrder(Customer customer, Restaurant restaurant, MenuItem item, int qty) {
         cartService.addItemToCart(customer, restaurant.getRestaurantId(), item.getMenuItemId(), qty);
-        orderService.placeOrder(customer, new CODPayment());
+        orderService.placeOrder(customer, new CODPayment(), customer.getAddresses().get(0));
         return customer.getOrderHistory().get(customer.getOrderHistory().size() - 1);
     }
 
@@ -83,7 +85,7 @@ class OrderServiceTest {
     void placeOrder_ShouldAssignDeliveryPartnerInSameCity() {
         Order order = placeTestOrder(customerRajkot, restaurantRajkot, pizza, 1);
 
-        String partnerCity    = order.getAssingedDeliveryPartner().getCity();
+        String partnerCity    = order.getAssignedDeliveryPartner().getCity();
         String restaurantCity = restaurantRajkot.getCity();
 
         assertEquals(restaurantCity, partnerCity);
@@ -122,7 +124,7 @@ class OrderServiceTest {
                 pizza.getMenuItemId(), 1);
 
         assertThrows(DeliveryPartnerNotAvailable.class, () ->
-                orderService.placeOrder(customerRajkot, new CODPayment())
+                orderService.placeOrder(customerRajkot, new CODPayment(), customerRajkot.getAddresses().get(0))
         );
     }
 
@@ -130,20 +132,20 @@ class OrderServiceTest {
     void placeOrder_NoPartnerAvailableC2() {
         cartService.addItemToCart(customerRajkot, restaurantRajkot.getRestaurantId(),
                 pizza.getMenuItemId(), 1);
-        orderService.placeOrder(customerRajkot, new CODPayment());
+        orderService.placeOrder(customerRajkot, new CODPayment(), customerRajkot.getAddresses().get(0));
 
         cartService.addItemToCart(customerRajkot, restaurantRajkot.getRestaurantId(),
                 pizza.getMenuItemId(), 1);
 
         assertThrows(DeliveryPartnerNotAvailable.class, () ->
-                orderService.placeOrder(customerRajkot, new CODPayment())
+                orderService.placeOrder(customerRajkot, new CODPayment(), customerRajkot.getAddresses().get(0))
         );
     }
 
     @Test
     void placeOrder_NonCustomerUser() {
         assertThrows(InvalidUserTypeException.class, () ->
-                orderService.placeOrder(dpRajkot, new CODPayment())
+                orderService.placeOrder(dpRajkot, new CODPayment(), null)
         );
     }
 
@@ -156,7 +158,22 @@ class OrderServiceTest {
                 pizza.getMenuItemId(), 1);
 
         assertThrows(DeliveryPartnerNotAvailable.class, () ->
-                orderService.placeOrder(customerRajkot, new CODPayment())
+                orderService.placeOrder(customerRajkot, new CODPayment(), customerRajkot.getAddresses().get(0))
+        );
+    }
+
+    @Test
+    void placeOrder_CityMismatch_ShouldThrowException() {
+        // Set up restaurant in Surat, pizza is added there
+        pizza = new MenuItem("Surat Pizza", 200.0, true);
+        restaurantSurat.addMenuItem(pizza);
+        
+        // Add item from Surat restaurant to Rajkot customer's cart
+        cartService.addItemToCart(customerRajkot, restaurantSurat.getRestaurantId(), pizza.getMenuItemId(), 1);
+
+        // Rajkot customer's primary address is in Rajkot, while restaurant is in Surat. They should mismatch.
+        assertThrows(com.fooddelivery.exceptions.InvalidOrderException.class, () ->
+                orderService.placeOrder(customerRajkot, new CODPayment(), customerRajkot.getAddresses().get(0))
         );
     }
 }

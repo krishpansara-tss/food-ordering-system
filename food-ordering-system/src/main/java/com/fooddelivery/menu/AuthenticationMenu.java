@@ -33,7 +33,7 @@ public class AuthenticationMenu {
         AdminMenu adminMenu = new AdminMenu(adminService, userService, restaurantService);
         UserMenu userMenu = new UserMenu(restaurantService, cartService, orderService, userService);
         RestaurantMenu restaurantMenu = new RestaurantMenu(restaurantService, adminService, orderService);
-        DeliveryPartnerMenu deliveryPartnerMenu = new DeliveryPartnerMenu(orderService, deliveryPartnerService);
+        DPMenu deliveryPartnerMenu = new DPMenu(orderService, deliveryPartnerService);
 
         while (true) {
             System.out.println("\n=============================================");
@@ -128,9 +128,10 @@ public class AuthenticationMenu {
                 // go to restaurant
                 case 5:
                     String restaurantId = InputClass.readString(scanner, "Enter Restaurant ID (e.g. REST-1001): ").toUpperCase();
+                    restaurantPassword = InputClass.readString(scanner, "Enter Password of Your  Restaurant: ");
 
                     try{
-                        Restaurant restaurant = restaurantService.loginIntoRestaurant(restaurantId);
+                        Restaurant restaurant = restaurantService.loginIntoRestaurant(restaurantId, restaurantPassword);
                         restaurantMenu.restaurantMenu(restaurant, scanner);
                     } catch (Exception e) {
                         System.out.println("Login Failed: " + e.getMessage());

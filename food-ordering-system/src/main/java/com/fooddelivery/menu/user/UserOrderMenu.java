@@ -2,21 +2,25 @@ package com.fooddelivery.menu.user;
 
 
 import com.fooddelivery.interfaces.PaymentMode;
+import com.fooddelivery.model.Address;
 import com.fooddelivery.model.Customer;
 import com.fooddelivery.model.User;
 import com.fooddelivery.payment.CODPayment;
 import com.fooddelivery.payment.CardPayment;
 import com.fooddelivery.payment.UPIPayment;
 import com.fooddelivery.services.OrderService;
+import com.fooddelivery.services.UserService;
 import com.fooddelivery.util.InputClass;
 
 import java.util.Scanner;
 
 public class UserOrderMenu {
     private OrderService orderService;
+    private UserService userService;
 
-    public UserOrderMenu(OrderService orderService) {
+    public UserOrderMenu(OrderService orderService, UserService userService) {
         this.orderService = orderService;
+        this.userService = userService;
     }
 
     public void userOrderMenu(User user, Scanner scanner) {
@@ -36,6 +40,43 @@ public class UserOrderMenu {
             switch (choice) {
                 // place order
                 case 1:
+                    Address selectedAddress;
+                    if (customer.getAddresses().isEmpty()) {
+                        System.out.println("\nYou have no saved addresses. You must add one before placing an order.");
+                        System.out.println("\n--- Add New Address ---");
+                        String label = InputClass.readString(scanner, "Enter label (e.g., Home, Work): ");
+                        String street = InputClass.readString(scanner, "Enter street name: ");
+                        String city = InputClass.readString(scanner, "Enter city: ");
+                        try {
+                            selectedAddress = userService.addAddressToCustomer(customer, label, street, city);
+                        } catch (Exception e) {
+                            System.out.println("Error adding address: " + e.getMessage());
+                            break;
+                        }
+                    } else {
+                        System.out.println("\nSelect Delivery Address:");
+                        for (int i = 0; i < customer.getAddresses().size(); i++) {
+                            System.out.println((i + 1) + ". " + customer.getAddresses().get(i));
+                        }
+                        System.out.println((customer.getAddresses().size() + 1) + ". Add new Address");
+                        int newLimit = customer.getAddresses().size() + 1;
+                        int addrChoice = InputClass.readInt(scanner, "Choose option (1-" + newLimit + "): ", 1, newLimit);
+                        if (addrChoice == newLimit) {
+                            System.out.println("\n--- Add New Address ---");
+                            String label = InputClass.readString(scanner, "Enter label (e.g., Home, Work): ");
+                            String street = InputClass.readString(scanner, "Enter street name: ");
+                            String city = InputClass.readString(scanner, "Enter city: ");
+                            try {
+                                selectedAddress = userService.addAddressToCustomer(customer, label, street, city);
+                            } catch (Exception e) {
+                                System.out.println("Error adding address: " + e.getMessage());
+                                break;
+                            }
+                        } else {
+                            selectedAddress = customer.getAddresses().get(addrChoice - 1);
+                        }
+                    }
+
                     System.out.println("\nSelect Payment Method:");
                     System.out.println("1. Card Payment");
                     System.out.println("2. UPI Payment");
@@ -58,7 +99,7 @@ public class UserOrderMenu {
                             System.out.println("Invalid payment choice. Order cancelled.");
                             return;
                     }
-                    orderService.placeOrderFlow(customer, paymentMode);
+                    orderService.placeOrderFlow(customer, paymentMode, selectedAddress);
                     break;
 
                 // display all order history

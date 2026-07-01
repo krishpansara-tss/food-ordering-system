@@ -23,7 +23,7 @@ public class OrderService {
         this.restaurantRepository = restaurantRepository;
     }
 
-    public void placeOrder(User user, PaymentMode paymentMode){
+    public void placeOrder(User user, PaymentMode paymentMode, Address deliveryAddress){
         if(!(user instanceof Customer)){
             throw new InvalidUserTypeException(user.getClass().getName() + " is not supported the place order operation");
         }
@@ -60,14 +60,21 @@ public class OrderService {
 
         double finalAmount = cartTotal - appliedDiscount;
 
+        if (deliveryAddress == null) {
+            throw new InvalidOrderException("Order failed: Delivery address is required.");
+        }
+
         String restaurantCity = restaurantRepository.findRestaurantById(restaurantId).getCity();
+        if (!restaurantCity.equalsIgnoreCase(deliveryAddress.getCity())) {
+            throw new InvalidOrderException("Order failed: Restaurant is in " + restaurantCity + ", but your delivery address is in " + deliveryAddress.getCity() + ". They must be in the same city.");
+        }
 
-        DeliveryPartner assingedDeliveryPartner = assignDeliveryPartnerByCity(restaurantCity);
+        DeliveryPartner assignedDeliveryPartner = assignDeliveryPartnerByCity(deliveryAddress.getCity());
 
-        if(assingedDeliveryPartner == null){
+        if(assignedDeliveryPartner == null){
             throw new DeliveryPartnerNotAvailable("Delivery Partner is Not available now, try again after some time");
         }
-        assingedDeliveryPartner.setAvailable(false);
+        assignedDeliveryPartner.setAvailable(false);
 
         Cart cartSnapshot = new Cart();
         cartSnapshot.setCurrentRestaurantId(cart.getCurrentRestaurantId());
@@ -77,21 +84,22 @@ public class OrderService {
                 .customer(customer)
                 .restaurantId(restaurantId)
                 .restaurantName(restaurantName)
-                .assignedDeliveryPartner(assingedDeliveryPartner)
+                .assignedDeliveryPartner(assignedDeliveryPartner)
                 .listOfItem(cartSnapshot)
                 .totalAmount(cartTotal)
                 .appliedDiscount(appliedDiscount)
                 .finalAmount(finalAmount)
                 .paymentMode(paymentMode)
+                .deliveryAddress(deliveryAddress)
                 .build();
 
 
         orderRepository.addOrder(order);
         customer.addOrderHistory(order);
 
-        assingedDeliveryPartner.setCurrentOrder(order);
-        assingedDeliveryPartner.getAssignedOrderList().add(order);
-        assingedDeliveryPartner.setEarning(assingedDeliveryPartner.getEarning() + 10.0);
+        assignedDeliveryPartner.setCurrentOrder(order);
+        assignedDeliveryPartner.getAssignedOrderList().add(order);
+        assignedDeliveryPartner.setEarning(assignedDeliveryPartner.getEarning() + 10.0);
         paymentMode.pay(finalAmount);
 
         printInvoice(order, customer);
@@ -131,6 +139,7 @@ public class OrderService {
         System.out.println("+---------------------------------------------------+");
         System.out.printf(" Order ID: %-15s | Customer: %-13s \n", order.getOrderId(), customer.getUserName());
         System.out.printf(" Order Date: %-39s \n", order.getOrderDate());
+        System.out.printf(" Delivery Address: %-32s \n", order.getDeliveryAddress() != null ? order.getDeliveryAddress().toString() : "N/A");
         System.out.println("+---------------------------------------------------+");
         System.out.printf(" %-20s | %-4s | %-10s | %-8s \n", "Item Name", "Qty", "Price", "Total");
         System.out.println("+---------------------------------------------------+");
@@ -145,7 +154,7 @@ public class OrderService {
         System.out.printf("  GRAND TOTAL:                              ₹%-7.2f  \n", order.getFinalAmount());
         System.out.println("+---------------------------------------------------+");
         System.out.printf("  Payment Mode: %-35s \n", order.getPaymentMode());
-        System.out.printf("  Assigned Delivery Executive: %-20s \n", order.getAssingedDeliveryPartner().getUserName());
+        System.out.printf("  Assigned Delivery Executive: %-20s \n", order.getAssignedDeliveryPartner().getUserName());
         System.out.printf("  Current State: %-34s \n", order.getOrderStatus());
         System.out.println("+---------------------------------------------------+");
     }
@@ -154,7 +163,7 @@ public class OrderService {
         List<Order> orderHistoryList = customer.getOrderHistory();
 
         if(orderHistoryList.isEmpty()){
-            System.out.println("Your haven't ordered anything yet");
+            System.out.println("You haven't ordered anything yet");
             return;
         }
 
@@ -251,13 +260,11 @@ public class OrderService {
     }
 
     public Order findOrderById(String orderId) {
-        Map<String, Order> orders = orderRepository.getOrderMap();
-        for (Order order : orders.values()) {
-            if (order.getOrderId().equalsIgnoreCase(orderId)) {
-                return order;
-            }
+        Order order = orderRepository.findOrderById(orderId);
+        if(order == null){
+            throw new OrderNotFoundException("Order having ID: " + orderId + " not found.");
         }
-        return null;
+        return order;
     }
 
     public void getYourOrderStatus(String orderId){
@@ -289,12 +296,12 @@ public class OrderService {
         OrderStatusType currType = order.getOrderStatus().getStatus();
 
         System.out.println("Order status updated successfully! Order ID: " + orderId + " is now " + currType);
-        if (currType == OrderStatusType.DELIVERED && order.getAssingedDeliveryPartner() != null) {
+        if (currType == OrderStatusType.DELIVERED && order.getAssignedDeliveryPartner() != null) {
             if(order.getPaymentMode() instanceof CODPayment){
                 ((CODPayment) order.getPaymentMode()).paymentDoneOnCOD(order.getFinalAmount());
             }
-            order.getAssingedDeliveryPartner().setAvailable(true);
-            System.out.println("Delivery partner " + order.getAssingedDeliveryPartner().getUserName() + " is now marked AVAILABLE.");
+            order.getAssignedDeliveryPartner().setAvailable(true);
+            System.out.println("Delivery partner " + order.getAssignedDeliveryPartner().getUserName() + " is now marked AVAILABLE.");
         }
     }
 
@@ -303,6 +310,7 @@ public class OrderService {
         System.out.println("Order ID     : " + order.getOrderId());
         System.out.println("Restaurant   : " + order.getRestaurantName());
         System.out.println("Customer     : " + order.getCustomer().getUserName());
+        System.out.println("Delivery Addr: " + (order.getDeliveryAddress() != null ? order.getDeliveryAddress().toString() : "N/A"));
         System.out.println("Status       : " + order.getOrderStatus());
         System.out.println("Payment Mode : " + order.getPaymentMode());
         System.out.println("Items:");
@@ -313,7 +321,7 @@ public class OrderService {
         System.out.println("================================================");
     }
 
-    public void placeOrderFlow(Customer customer, PaymentMode paymentMode) {
+    public void placeOrderFlow(Customer customer, PaymentMode paymentMode, Address deliveryAddress) {
         if (customer.getCart() == null || customer.getCart().getCartItemMap().isEmpty()) {
             System.out.println("Cannot place order: Your cart is empty.");
             return;
@@ -325,7 +333,7 @@ public class OrderService {
         }
 
         try {
-            placeOrder(customer, paymentMode);
+            placeOrder(customer, paymentMode, deliveryAddress);
             System.out.println("Order has been placed successfully!");
         } catch (Exception e) {
             System.out.println("Failed to place order: " + e.getMessage());

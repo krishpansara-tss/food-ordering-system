@@ -54,7 +54,7 @@ public class AdminMenu {
                     String adminCity = InputClass.readString(scanner, "Enter City: ");
 
                     try {
-                        User newAdmin = adminService.addAdmin(username, password, phoneNumber, adminCity, UserType.ADMIN);
+                        User newAdmin = adminService.addAdmin(admin, username, password, phoneNumber, adminCity, UserType.ADMIN);
                         System.out.println("Please note down your admin ID for future logins: " + newAdmin.getUserId());
                     } catch (Exception e) {
                         System.out.println("Registration failed: " + e.getMessage());

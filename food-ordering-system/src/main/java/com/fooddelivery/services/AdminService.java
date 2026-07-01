@@ -21,7 +21,10 @@ public class AdminService {
         this.userRepository = userRepository;
     }
 
-    public User addAdmin(String userName, String password, String phoneNumber, String city, UserType userType){
+    public User addAdmin(User callingAdmin, String userName, String password, String phoneNumber, String city, UserType userType){
+        if (callingAdmin == null || callingAdmin.getUserType() != UserType.SUPER_ADMIN) {
+            throw new IllegalArgumentException("Only Super Admins can add new admins.");
+        }
         User newAdmin = UserFactory.createAdmin(userType, userName, password, phoneNumber, city);
 
         userRepository.addUser(newAdmin);

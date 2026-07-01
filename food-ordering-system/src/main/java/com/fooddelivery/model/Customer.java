@@ -9,9 +9,18 @@ public class Customer extends User {
     private static long customerCount = 1000;
     private List<Order> orderHistory = new ArrayList<>();
     private Cart cart = new Cart();
+    private List<Address> addresses = new ArrayList<>();
 
     public Customer(String userName, String password, String phoneNumber, String city) {
         super("CUST-" + (++customerCount), userName, password, phoneNumber, city, UserType.CUSTOMER);
+    }
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void addAddress(Address address) {
+        this.addresses.add(address);
     }
 
     public List<Order> getOrderHistory() {

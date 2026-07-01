@@ -37,14 +37,14 @@ class RestaurantServiceTest {
     @Test
     void loginIntoRestaurant_Existing() {
         Restaurant createdrestaurant = restaurantService.createRestaurant("Ganesh", "123","0987654321", "Rajkot");
-        Restaurant loggedInRestaurant = restaurantService.loginIntoRestaurant(createdrestaurant.getRestaurantId());
+        Restaurant loggedInRestaurant = restaurantService.loginIntoRestaurant(createdrestaurant.getRestaurantId(), createdrestaurant.getPassword());
         assertEquals(createdrestaurant, loggedInRestaurant);
     }
 
     @Test
     void loginIntoRestaurant_NotExist() {
         assertThrows(RestaurantNotFoundException.class, () ->
-                restaurantService.loginIntoRestaurant("DMY_ID")
+                restaurantService.loginIntoRestaurant("DMY_ID", "123")
         );
     }
 

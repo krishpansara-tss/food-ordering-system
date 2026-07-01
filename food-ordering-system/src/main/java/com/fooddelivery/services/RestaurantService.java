@@ -1,10 +1,7 @@
 package com.fooddelivery.services;
 
 import com.fooddelivery.enums.CuisineType;
-import com.fooddelivery.exceptions.InvalidUserCredentialsException;
-import com.fooddelivery.exceptions.ItemAlreadyExist;
-import com.fooddelivery.exceptions.RestaurantNotFoundException;
-import com.fooddelivery.exceptions.UserNotFoundException;
+import com.fooddelivery.exceptions.*;
 import com.fooddelivery.factory.RestaurantFactory;
 import com.fooddelivery.model.MenuItem;
 import com.fooddelivery.model.Restaurant;
@@ -28,10 +25,14 @@ public class RestaurantService {
         return restaurant;
     }
 
-    public Restaurant loginIntoRestaurant(String restaurantId){
+    public Restaurant loginIntoRestaurant(String restaurantId, String password){
         Restaurant restaurant = restaurantRepository.findRestaurantById(restaurantId.toUpperCase());
         if(restaurant == null){
-            throw new RestaurantNotFoundException("Login Failed: Restaurant with ID [" + restaurantId + "] not found.");
+            throw new RestaurantNotFoundException("Login Failed: Restaurant with ID " + restaurantId + " not found.");
+        }
+
+        if(!(restaurant.getPassword().equals(password))){
+            throw new InvalidPasswordException("Login Failed: Password don't match");
         }
 
         return restaurant;
