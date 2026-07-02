@@ -32,4 +32,8 @@ public class RestaurantRepository {
 
         return null;
     }
+
+    public void removeRestaurant(String restaurantId){
+        restaurantList.remove(restaurantId);
+    }
 }

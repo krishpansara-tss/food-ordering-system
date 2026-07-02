@@ -3,12 +3,14 @@ package com.fooddelivery.services;
 import com.fooddelivery.enums.CuisineType;
 import com.fooddelivery.exceptions.*;
 import com.fooddelivery.factory.RestaurantFactory;
+import com.fooddelivery.model.Cuisine;
 import com.fooddelivery.model.MenuItem;
 import com.fooddelivery.model.Restaurant;
 import com.fooddelivery.model.User;
 import com.fooddelivery.repository.RestaurantRepository;
 
 import java.util.Map;
+import java.util.Set;
 
 public class RestaurantService {
     private RestaurantRepository restaurantRepository;
@@ -17,8 +19,8 @@ public class RestaurantService {
         this.restaurantRepository = restaurantRepository;
     }
 
-    public Restaurant createRestaurant(String restaurantName, String password, String phoneNumber, String city){
-        Restaurant restaurant = RestaurantFactory.createRestaurant(restaurantName, password, phoneNumber, city);
+    public Restaurant createRestaurant(String restaurantName, String password, String phoneNumber, String city,  String locality){
+        Restaurant restaurant = RestaurantFactory.createRestaurant(restaurantName, password, phoneNumber, city, locality);
 
         restaurantRepository.addRestaurant(restaurant);
         System.out.println("Restaurant registered successfully! Assigned ID: " + restaurant.getRestaurantId());
@@ -48,7 +50,7 @@ public class RestaurantService {
 
         System.out.println("\n============== AVAILABLE RESTAURANTS ==============");
         for (Restaurant r : restaurantMap.values()) {
-            System.out.println("[" + r.getRestaurantId() + "] " + r.getRestaurantName() + " (" + r.getCity() + ")");
+            System.out.println("[" + r.getRestaurantId() + "] " + r.getRestaurantName() + " ("  + r.getLocality() + " | " + r.getCity() + ")");
         }
         System.out.println("====================================================");
     }
@@ -65,7 +67,7 @@ public class RestaurantService {
         System.out.println("\n============== AVAILABLE RESTAURANTS IN " + city.toUpperCase() + " ==============");
         for (Restaurant r : restaurantMap.values()) {
             if (r.getCity().equalsIgnoreCase(city)) {
-                System.out.println(r.getRestaurantId() + " -> " + r.getRestaurantName());
+                System.out.println(r.getRestaurantId() + " -> " + r.getRestaurantName() + "  | Address: " + r.getLocality() + " " + r.getCity());
                 found = true;
             }
         }
@@ -75,9 +77,6 @@ public class RestaurantService {
         System.out.println("====================================================");
     }
 
-    public void addItemToRestaurant(String restaurantId, String itemName, double price, boolean isVeg){
-        addItemToRestaurant(restaurantId, itemName, price, isVeg, CuisineType.INDIAN);
-    }
 
     public void addItemToRestaurant(String restaurantId, String itemName, double price, boolean isVeg, CuisineType cuisineType){
         Restaurant restaurant = restaurantRepository.findRestaurantById(restaurantId);
@@ -91,6 +90,8 @@ public class RestaurantService {
                 throw new ItemAlreadyExist("Item having name: " + itemName + " is already exists");
             }
         }
+
+        Set<Cuisine> cuisineSet = restaurant.getCuisines();
 
         MenuItem menuItem = new MenuItem(itemName, price, isVeg, cuisineType);
 
@@ -160,10 +161,39 @@ public class RestaurantService {
         }
 
         System.out.println("------ Contact Detail ------");
-        System.out.println("Restaurant ID   :" + restaurantId);
-        System.out.println("Restaurant Name : " + restaurant.getRestaurantName());
-        System.out.println("Contact Number  : " + restaurant.getPhoneNumber());
+        System.out.println("Restaurant ID        : " + restaurantId);
+        System.out.println("Restaurant Name      : " + restaurant.getRestaurantName());
+        System.out.println("Contact Number       : " + restaurant.getPhoneNumber());
+        System.out.println("Restaurant City      : " + restaurant.getCity());
+        System.out.println("Restaurant Locality  : " + restaurant.getLocality());
         System.out.println("-----------------------------");
+    }
 
+    public void removeMenuItem(Restaurant restaurant, String menuId){
+        if(restaurant == null){
+            throw new RestaurantNotFoundException("Restaurant not found.");
+        }
+
+        Map<String, MenuItem> menuItemMap = restaurant.getMenuItemList();
+        if(menuItemMap.isEmpty()){
+            System.out.println("No menu item added to the restaurant.");
+        }
+
+        MenuItem menuItem = menuItemMap.get(menuId);
+        if(menuItem == null){
+            throw new MenuItemNotFoundException("Menu Item having ID: " + menuId + " is not found.");
+        }
+
+        menuItemMap.remove(menuId);
+        System.out.println("Menu Item having ID: " + menuId + " is removed Successfully.");
+    }
+
+    public void removeRestaurant(Restaurant restaurant){
+        if(restaurant == null){
+            throw new RestaurantNotFoundException("Restaurant not found.");
+        }
+
+       restaurantRepository.removeRestaurant(restaurant.getRestaurantId());
+        System.out.println("Restaurant is removed Successfully.");
     }
 }

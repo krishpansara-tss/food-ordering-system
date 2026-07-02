@@ -15,13 +15,9 @@ import java.util.Scanner;
 
 public class RestaurantMenuItemMenu {
     private RestaurantService restaurantService;
-    private AdminService adminService;
-    private OrderService orderService;
 
-    public RestaurantMenuItemMenu(RestaurantService restaurantService, AdminService adminService,OrderService orderService) {
+    public RestaurantMenuItemMenu(RestaurantService restaurantService) {
         this.restaurantService = restaurantService;
-        this.adminService = adminService;
-        this.orderService = orderService;
     }
 
     public void restaurantMenuItemMenu(Restaurant restaurant, Scanner scanner) {
@@ -32,9 +28,10 @@ public class RestaurantMenuItemMenu {
             System.out.println("1. Display Menu");
             System.out.println("2. Add Item to Restaurant Menu");
             System.out.println("3. Update Menu Item Details");
-            System.out.println("4. Back to Main Restaurant Menu");
+            System.out.println("4. Remove Menu Item from the Restaurant");
+            System.out.println("5. Back to Main Restaurant Menu");
 
-            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 4);
+            int choice = InputClass.readInt(scanner, "Please enter your choice: ", 1, 5);
 
             switch (choice) {
                 // display menu / available items
@@ -102,13 +99,22 @@ public class RestaurantMenuItemMenu {
                     System.out.println("Menu item updated successfully!");
                     break;
 
-                // logout
+                // remove menu item from the restaurant
                 case 4:
+                    String menuItemId = InputClass.readString(scanner, "Enter Menu Item ID (e.g. ITEM-1001): ").toUpperCase().trim();
+                    try{
+                        restaurantService.removeMenuItem(restaurant, menuItemId);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+
+                // logout
+                case 5:
                     System.out.println("Back to Main Restaurant Owner session...");
                     return;
 
                 default:
-                    System.out.println("Invalid choice. Please select from 1-4.");
+                    System.out.println("Invalid choice. Please select from 1-5.");
             }
         }
     }

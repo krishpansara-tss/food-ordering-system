@@ -10,10 +10,6 @@ public class MenuItem {
     private boolean isVeg;
     private CuisineType cuisineType;
 
-    public MenuItem(String itemName, double price, boolean isVeg) {
-        this(itemName, price, isVeg, CuisineType.INDIAN);
-    }
-
     public MenuItem(String itemName, double price, boolean isVeg, CuisineType cuisineType) {
         this.menuItemId = "ITEM-" + (++itemCount);
         this.itemName = itemName;

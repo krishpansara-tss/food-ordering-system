@@ -1,5 +1,6 @@
 package com.fooddelivery.services;
 
+import com.fooddelivery.enums.CuisineType;
 import com.fooddelivery.exceptions.DeliveryPartnerNotAvailable;
 import com.fooddelivery.exceptions.InvalidUserTypeException;
 import com.fooddelivery.model.*;
@@ -51,12 +52,12 @@ class OrderServiceTest {
         dpRajkot = new DeliveryPartner("Nilesh",  "123",  "9988000001", "Rajkot");
         dpSurat     = new DeliveryPartner("Krish",   "123",  "9988000002", "Surat");
         
-        restaurantRajkot = new Restaurant("Manek Chowk", "123","9000001111", "Rajkot");
-        pizza = new MenuItem("Gujarati Thali", 200.0, true);
+        restaurantRajkot = new Restaurant("Manek Chowk", "123","9000001111", "Rajkot", "Mavdi");
+        pizza = new MenuItem("Gujarati Thali", 200.0, true, CuisineType.STREET_FOOD);
         restaurantRajkot.addMenuItem(pizza);
 
-        restaurantSurat = new Restaurant("Surat Locha Corner", "123", "9000002222", "Surat");
-        locha = new MenuItem("Surat Locha", 50.0, true);
+        restaurantSurat = new Restaurant("Surat Locha Corner", "123", "9000002222", "Surat", "Vastrapur");
+        locha = new MenuItem("Surat Locha", 50.0, true, CuisineType.STREET_FOOD);
         restaurantSurat.addMenuItem(locha);
         
         userRepository.addUser(customerRajkot);
@@ -165,7 +166,7 @@ class OrderServiceTest {
     @Test
     void placeOrder_CityMismatch_ShouldThrowException() {
         // Set up restaurant in Surat, pizza is added there
-        pizza = new MenuItem("Surat Pizza", 200.0, true);
+        pizza = new MenuItem("Surat Pizza", 200.0, true, CuisineType.STREET_FOOD);
         restaurantSurat.addMenuItem(pizza);
         
         // Add item from Surat restaurant to Rajkot customer's cart

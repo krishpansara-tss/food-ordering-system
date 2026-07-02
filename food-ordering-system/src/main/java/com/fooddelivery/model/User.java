@@ -3,12 +3,12 @@ package com.fooddelivery.model;
 import com.fooddelivery.enums.UserType;
 
 public abstract class User {
-    protected String userId;
-    protected String userName;
-    protected String phoneNumber;
-    protected String city;
-    protected String password;
-    protected UserType userType;
+    private String userId;
+    private String userName;
+    private String phoneNumber;
+    private String city;
+    private String password;
+    private UserType userType;
 
     public User(String userId, String userName, String password, String phoneNumber, String city, UserType userType) {
         this.userId = userId;

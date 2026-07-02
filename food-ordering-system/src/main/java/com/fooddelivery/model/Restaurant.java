@@ -1,9 +1,6 @@
 package com.fooddelivery.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Restaurant {
     private static long restaurantCount = 1000;
@@ -11,12 +8,15 @@ public class Restaurant {
     private String password;
     private String restaurantName;
     private String phoneNumber;
+    private String locality;
     private String city;
     private Map<String, MenuItem> menuItemList = new HashMap();
+    private Set<Cuisine> cuisines = new HashSet<>();
 
-    public Restaurant(String restaurantName, String password, String phoneNumber, String city) {
+    public Restaurant(String restaurantName, String password, String phoneNumber, String city, String locality) {
         this.restaurantId = "REST-"  + (++restaurantCount);
         this.password = password;
+        this.locality = locality;
         this.restaurantName = restaurantName;
         this.phoneNumber = phoneNumber;
         this.city = city;
@@ -32,6 +32,14 @@ public class Restaurant {
 
     public void setRestaurantName(String restaurantName) {
         this.restaurantName = restaurantName;
+    }
+
+    public String getLocality() {
+        return locality;
+    }
+
+    public Set<Cuisine> getCuisines() {
+        return cuisines;
     }
 
     public String getPassword() {

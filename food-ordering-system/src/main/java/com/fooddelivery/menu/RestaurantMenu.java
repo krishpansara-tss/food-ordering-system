@@ -17,7 +17,7 @@ public class RestaurantMenu {
     private RestaurantProfileMenu profileMenu;
 
     public RestaurantMenu(RestaurantService restaurantService, AdminService adminService, OrderService orderService) {
-        this.menuItemMenu = new RestaurantMenuItemMenu(restaurantService, adminService, orderService);
+        this.menuItemMenu = new RestaurantMenuItemMenu(restaurantService);
         this.orderMenu = new RestaurantOrderMenu(orderService);
         this.profileMenu = new RestaurantProfileMenu(restaurantService, adminService);
     }

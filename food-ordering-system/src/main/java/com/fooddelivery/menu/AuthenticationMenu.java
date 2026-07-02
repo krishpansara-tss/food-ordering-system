@@ -122,8 +122,10 @@ public class AuthenticationMenu {
                     String restaurantPassword = InputClass.readString(scanner, "Enter Password of Your  Restaurant: ");
                     String phoneNumber = InputClass.readString(scanner, "Enter Phone Number: ");
                     String city = InputClass.readString(scanner, "Enter City: ");
+                    String locality = InputClass.readString(scanner, "Enter the area/locality of your Restaurant: ");
+
                     try {
-                        Restaurant restaurant = restaurantService.createRestaurant(restaurantName, restaurantPassword, phoneNumber, city);
+                        Restaurant restaurant = restaurantService.createRestaurant(restaurantName, restaurantPassword, phoneNumber, city, locality);
                         System.out.println("Please note down your Restaurant ID for future logins: " + restaurant.getRestaurantId());
                     }catch (Exception e){
                         System.out.println("Failed to join with us: " + e.getMessage());
@@ -141,6 +143,7 @@ public class AuthenticationMenu {
                     } catch (Exception e) {
                         System.out.println("Login Failed: " + e.getMessage());
                     }
+
                     break;
 
                 // exit

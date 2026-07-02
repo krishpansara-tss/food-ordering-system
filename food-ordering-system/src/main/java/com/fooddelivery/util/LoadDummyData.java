@@ -34,7 +34,7 @@ public class LoadDummyData {
         userRepository.addUser(dp2);
         userRepository.addUser(dp3);
 
-        Restaurant r1 = RestaurantFactory.createRestaurant("Mavdi Chowk Khichdi House","123", "9000111001", "Rajkot");
+        Restaurant r1 = RestaurantFactory.createRestaurant("Mavdi Chowk Khichdi House","123", "9000111001", "Rajkot", "Mavdi Chowk");
         r1.addMenuItem(new MenuItem("Dal Khichdi",           60.0,  true, CuisineType.INDIAN));
         r1.addMenuItem(new MenuItem("Masala Khichdi",        75.0,  true, CuisineType.INDIAN));
         r1.addMenuItem(new MenuItem("Gujarati Thali",        180.0, true, CuisineType.GUJARATI));
@@ -45,7 +45,7 @@ public class LoadDummyData {
         r1.addMenuItem(new MenuItem("Gobi Manchurian",       100.0, true, CuisineType.CHINESE));
         restaurantRepository.addRestaurant(r1);
 
-        Restaurant r2 = RestaurantFactory.createRestaurant("Surat Locha Corner",   "123",    "9000111002", "Surat");
+        Restaurant r2 = RestaurantFactory.createRestaurant("Surat Locha Corner",   "123",    "9000111002", "Surat", "Vastrapur");
         r2.addMenuItem(new MenuItem("Surat Locha",           50.0,  true, CuisineType.STREET_FOOD));
         r2.addMenuItem(new MenuItem("Ghari Mithai",          120.0, true, CuisineType.GUJARATI));
         r2.addMenuItem(new MenuItem("Undhiyu",               150.0, true, CuisineType.GUJARATI));
@@ -56,7 +56,7 @@ public class LoadDummyData {
         r2.addMenuItem(new MenuItem("Pasta Primavera",       160.0, true, CuisineType.ITALIAN));
         restaurantRepository.addRestaurant(r2);
 
-        Restaurant r3 = RestaurantFactory.createRestaurant("Ahmedabad Adda","123","9000111003", "Ahmedabad");
+        Restaurant r3 = RestaurantFactory.createRestaurant("Ahmedabad Adda","123","9000111003", "Ahmedabad", "Bopal");
         r3.addMenuItem(new MenuItem("Sev Usal",              55.0,  true, CuisineType.STREET_FOOD));
         r3.addMenuItem(new MenuItem("Dabeli",                30.0,  true, CuisineType.STREET_FOOD));
         r3.addMenuItem(new MenuItem("Fafda Jalebi Combo",    80.0,  true, CuisineType.GUJARATI));
